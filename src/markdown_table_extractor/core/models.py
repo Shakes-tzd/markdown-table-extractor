@@ -116,7 +116,13 @@ app = marimo.App(width="medium")
 @app.cell
 def _():
     import marimo as mo
-    return (mo,)
+    import pandas as pd
+    from markdown_table_extractor.core.models import (
+        ExtractedTable,
+        ExtractionResult,
+        TableMergeStrategy,
+    )
+    return (mo, pd, ExtractedTable, ExtractionResult, TableMergeStrategy)
 
 
 @app.cell
@@ -138,10 +144,8 @@ def _(mo):
 
 
 @app.cell
-def _():
+def _(pd, ExtractedTable):
     # Live demo
-    import pandas as pd
-    
     df = pd.DataFrame({"Name": ["Alice", "Bob"], "Score": [95, 87]})
     table = ExtractedTable(
         dataframe=df,

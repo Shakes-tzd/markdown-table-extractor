@@ -146,7 +146,14 @@ app = marimo.App(width="medium")
 @app.cell
 def _():
     import marimo as mo
-    return (mo,)
+    from markdown_table_extractor.core.cleaner import (
+        clean_column_name,
+        clean_value,
+        headers_match,
+        normalize_headers,
+        merge_sub_header,
+    )
+    return (mo, clean_column_name, clean_value, headers_match, normalize_headers, merge_sub_header)
 
 
 @app.cell

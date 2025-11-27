@@ -1,6 +1,7 @@
 """Markdown table parsing utilities.
 
 This module contains functions for detecting and parsing markdown table structures.
+All functions handle the various alignment syntaxes used in markdown tables.
 """
 from __future__ import annotations
 
@@ -13,162 +14,216 @@ from typing import Optional
 # MODULE-LEVEL CODE (importable)
 # ============================================================================
 
-# Pattern for separator cells: ---, :---, ---:, :---:
-_SEPARATOR_CELL_PATTERN = re.compile(r"^:?-{1,}:?$")
-
-
-def is_table_row(line: str) -> bool:
-    """Check if a line looks like a markdown table row.
-    
-    Args:
-        line: A single line of text
-        
-    Returns:
-        True if the line starts and ends with pipe characters
-    """
-    stripped = line.strip()
-    return stripped.startswith("|") and stripped.endswith("|")
+# Pattern to detect separator cells (handles all alignment formats)
+SEPARATOR_CELL_PATTERN = re.compile(r'^:?-{1,}:?$')
 
 
 def is_separator_row(line: str) -> bool:
     """Check if a line is a markdown table separator row.
-    
-    Separator rows contain only dashes and optional colons for alignment:
-    - `| --- |` (no alignment)
-    - `| :--- |` (left align)
-    - `| ---: |` (right align)
-    - `| :---: |` (center align)
-    
+
+    Handles various alignment formats:
+    - |---|---|           (basic)
+    - | :--: | :--: |     (centered)
+    - |:---|---:|         (left/right aligned)
+    - | --- | --- | --- | (with spaces)
+
     Args:
-        line: A single line of text
-        
+        line: A single line of text to check
+
     Returns:
-        True if this is a separator row
+        True if the line is a table separator row
+
+    Examples:
+        >>> is_separator_row("| --- | --- |")
+        True
+        >>> is_separator_row("| :--: | :--: |")
+        True
+        >>> is_separator_row("| Data | More |")
+        False
     """
-    if not is_table_row(line):
+    stripped = line.strip()
+    if not stripped:
         return False
-    
-    cells = parse_table_row(line)
+
+    # Must contain at least one pipe and dash
+    if '|' not in stripped or '-' not in stripped:
+        return False
+
+    # Split by pipe and check each cell
+    cells = stripped.split('|')
+
+    # Filter out empty strings from leading/trailing pipes
+    cells = [c.strip() for c in cells if c.strip()]
+
     if not cells:
         return False
-    
-    return all(_SEPARATOR_CELL_PATTERN.match(cell.strip()) for cell in cells)
+
+    # Each cell should match: optional colons around dashes
+    return all(SEPARATOR_CELL_PATTERN.match(cell) for cell in cells)
 
 
-def is_sub_header_row(line: str, threshold: float = 0.7) -> bool:
-    """Check if a row is likely a sub-header (mostly empty cells).
-    
-    Sub-headers often appear after the separator row with content
-    only in the first cell(s), like category labels.
-    
+def is_table_row(line: str) -> bool:
+    """Check if a line is a table data row.
+
+    A table row starts and ends with a pipe character.
+
     Args:
-        line: A single line of text
-        threshold: Fraction of cells that must be empty (default 0.7)
-        
+        line: A single line of text to check
+
     Returns:
-        True if this appears to be a sub-header row
+        True if the line is a table row
+
+    Examples:
+        >>> is_table_row("| Cell 1 | Cell 2 |")
+        True
+        >>> is_table_row("Not a table row")
+        False
     """
-    if not is_table_row(line):
-        return False
-    
-    cells = parse_table_row(line)
-    if not cells:
-        return False
-    
-    empty_count = sum(1 for c in cells if not c.strip())
-    return empty_count / len(cells) >= threshold
+    stripped = line.strip()
+    return stripped.startswith('|') and stripped.endswith('|')
 
 
 def parse_table_row(line: str) -> list[str]:
-    """Parse a markdown table row into individual cells.
-    
-    Handles escaped pipes within cells.
-    
+    """Parse a table row into cell values.
+
     Args:
-        line: A markdown table row like `| A | B | C |`
-        
+        line: A table row line (must start and end with |)
+
     Returns:
-        List of cell contents: ["A", "B", "C"]
+        List of cell values with whitespace stripped
+
+    Examples:
+        >>> parse_table_row("| A | B | C |")
+        ['A', 'B', 'C']
     """
     stripped = line.strip()
-    
-    # Remove leading/trailing pipes
-    if stripped.startswith("|"):
+
+    # Remove leading and trailing pipes
+    if stripped.startswith('|'):
         stripped = stripped[1:]
-    if stripped.endswith("|"):
+    if stripped.endswith('|'):
         stripped = stripped[:-1]
-    
-    # Split on unescaped pipes
-    # Simple split for now - could be enhanced for escaped pipes
-    cells = stripped.split("|")
-    
-    return [cell.strip() for cell in cells]
+
+    # Split by | and strip whitespace
+    cells = [cell.strip() for cell in stripped.split('|')]
+    return cells
+
+
+def is_sub_header_row(line: str) -> bool:
+    """Detect if a row is a sub-header row (common in multi-level table headers).
+
+    Sub-header rows typically:
+    - Have mostly empty cells
+    - Have short text labels in some cells
+    - Appear right after the separator row
+
+    Args:
+        line: The table row line to check
+
+    Returns:
+        True if this appears to be a sub-header row
+
+    Examples:
+        >>> is_sub_header_row("| | | Early | Late | Both |")
+        True
+    """
+    if not is_table_row(line):
+        return False
+
+    cells = parse_table_row(line)
+
+    if not cells:
+        return False
+
+    # Count empty vs non-empty cells
+    non_empty = [c for c in cells if c.strip()]
+    empty_ratio = 1 - (len(non_empty) / len(cells)) if cells else 0
+
+    # If most cells are empty, check if non-empty ones look like sub-headers
+    if empty_ratio > 0.5:
+        for cell in non_empty:
+            # Sub-headers are typically short labels without numbers/dates
+            if len(cell) < 20 and not re.search(r'\d{4}|\d+\.\d+', cell):
+                continue
+            else:
+                return False
+        return True
+
+    return False
 
 
 def detect_caption(
     lines: list[str],
     table_start_line: int,
-    lookback: int = 5,
+    max_lines_before: int = 5
 ) -> tuple[Optional[str], bool, Optional[str], bool]:
-    """Look for a table caption above the table.
+    """Detect table caption by looking at lines before the table.
 
     Searches for patterns like:
-    - "Table 1. Description"
-    - "Table 1: Description"
-    - "Table 1 - Description"
+    - "Table 1. Title"
     - "Table 1 (Continued)"
-    - "Table 2" (bare number - likely malformed continuation)
+    - "**Table 1. Title**"
 
     Args:
-        lines: All lines of the document
-        table_start_line: Line index where table starts
-        lookback: How many lines above to search
+        lines: All lines in the document
+        table_start_line: Line index where the table starts
+        max_lines_before: Maximum lines to search before table
 
     Returns:
-        Tuple of (caption, is_continuation, table_number, is_bare):
-        - caption: Full caption text or None
-        - is_continuation: True if marked as "(Continued)" or bare
-        - table_number: Extracted table number (e.g., "1", "2", "3a") or None
-        - is_bare: True if caption has no description (just "Table N")
+        Tuple of (caption_text, is_continuation, table_number, is_bare_caption)
+        - caption_text: Full caption text or None
+        - is_continuation: True if caption contains "continued" marker
+        - table_number: Extracted table number (e.g., "3", "3a") or None
+        - is_bare_caption: True if caption is just "Table N" without description
     """
-    caption_pattern = re.compile(
-        r"^(?:table|tbl\.?)\s*(\d+[a-z]?)\s*[.:\-–—]?\s*(.*)",
-        re.IGNORECASE,
-    )
+    # Caption patterns for manuscripts
+    caption_patterns = [
+        re.compile(r'^(?:Table|TABLE)\s*(\d+[a-z]?)[.:]?\s*(.*)$', re.IGNORECASE),
+        re.compile(r'^(?:Table|TABLE)\s*(\d+[a-z]?)\s*\(([^)]+)\)\s*(.*)$', re.IGNORECASE),
+        re.compile(r'^\*\*(?:Table|TABLE)\s*(\d+[a-z]?)[.:]?\s*(.*)\*\*$', re.IGNORECASE),
+    ]
+
     continuation_pattern = re.compile(
-        r"\(?\s*(?:continued|cont\.?|cont'd)\s*\)?",
-        re.IGNORECASE,
+        r'\(?\s*(?:continued|cont\.?|cont\'d)\s*\)?',
+        re.IGNORECASE
     )
 
-    start = max(0, table_start_line - lookback)
+    search_start = max(0, table_start_line - max_lines_before)
 
-    for i in range(table_start_line - 1, start - 1, -1):
+    for i in range(table_start_line - 1, search_start - 1, -1):
+        if i < 0:
+            break
         line = lines[i].strip()
 
         # Skip empty lines
         if not line:
             continue
 
-        # Skip lines that look like table rows
-        if is_table_row(line):
+        # Skip horizontal rules
+        if line.startswith('---') and '|' not in line:
             continue
 
-        # Strip markdown formatting for matching (bold, italic, etc.)
-        clean_line = line.replace("**", "").replace("__", "").replace("*", "").replace("_", "").strip()
+        # Check caption patterns
+        for pattern in caption_patterns:
+            match = pattern.match(line)
+            if match:
+                is_continuation = bool(continuation_pattern.search(line))
+                table_number = match.group(1) if match.lastindex >= 1 else None
 
-        match = caption_pattern.match(clean_line)
-        if match:
-            table_num = match.group(1)  # e.g., "1", "2", "3a"
-            description = match.group(2).strip()  # e.g., "Patient Demographics"
+                # Check if bare caption (just "Table N" with no description)
+                # Get the description part (everything after the number)
+                if match.lastindex >= 2:
+                    description = match.group(2).strip()
+                    # Remove continuation markers to check for bare caption
+                    desc_clean = continuation_pattern.sub('', description).strip()
+                    is_bare_caption = not desc_clean or desc_clean in ['.', ':']
+                else:
+                    is_bare_caption = True
 
-            # Check if explicitly marked as continuation
-            has_continuation_marker = bool(continuation_pattern.search(clean_line))
+                return line, is_continuation, table_number, is_bare_caption
 
-            # Bare table number (no description) - likely malformed continuation
-            is_bare = not description
-
-            # Return original line with formatting intact
-            return line, has_continuation_marker or is_bare, table_num, is_bare
+        # If we hit a non-caption line, stop looking
+        break
 
     return None, False, None, False
 
@@ -183,31 +238,39 @@ app = marimo.App(width="medium")
 @app.cell
 def _():
     import marimo as mo
-    return (mo,)
+    # Import module-level functions for use in cells
+    from markdown_table_extractor.core.parser import (
+        is_separator_row,
+        is_table_row,
+        parse_table_row,
+        is_sub_header_row,
+        detect_caption,
+    )
+    return (mo, is_separator_row, is_table_row, parse_table_row, is_sub_header_row, detect_caption)
 
 
 @app.cell
 def _(mo):
-    mo.md(
-        """
-        # Markdown Table Parser
+    mo.md("""
+    # Markdown Table Parser
 
-        Functions for detecting and parsing markdown table structures.
+    Functions for detecting and parsing markdown table structures.
 
-        ## Key Functions
+    ## Key Functions
 
-        - `is_table_row(line)` - Check if line is a table row
-        - `is_separator_row(line)` - Check if line is separator (---)
-        - `parse_table_row(line)` - Extract cell contents
-        - `detect_caption(lines, start)` - Find table caption
-        """
-    )
+    - `is_table_row(line)` - Check if line is a table row
+    - `is_separator_row(line)` - Check if line is separator (---)
+    - `parse_table_row(line)` - Extract cell contents
+    - `detect_caption(lines, start)` - Find table caption
+    """)
     return
 
 
 @app.cell
 def _(mo):
-    mo.md("## Separator Detection Demo")
+    mo.md("""
+    ## Separator Detection Demo
+    """)
     return
 
 
@@ -221,7 +284,7 @@ def _():
         "| Data | More |",
         "| - | - |",
     ]
-    
+
     for line in test_lines:
         result = is_separator_row(line)
         print(f"{line:25} -> separator={result}")
@@ -230,7 +293,9 @@ def _():
 
 @app.cell
 def _(mo):
-    mo.md("## Row Parsing Demo")
+    mo.md("""
+    ## Row Parsing Demo
+    """)
     return
 
 
@@ -242,6 +307,35 @@ def _():
     print(f"Input: {row}")
     print(f"Cells: {cells}")
     return (row, cells)
+
+
+@app.cell
+def _(mo):
+    mo.md("""
+    ## Caption Detection Demo
+    """)
+    return
+
+
+@app.cell
+def _():
+    # Test caption detection
+    test_doc = [
+        "# Document",
+        "",
+        "Table 3. Test Results",
+        "",
+        "| Name | Score |",
+        "| --- | --- |",
+        "| Alice | 95 |",
+    ]
+
+    caption, is_cont, table_num, is_bare = detect_caption(test_doc, 4)
+    print(f"Caption: {caption}")
+    print(f"Is continuation: {is_cont}")
+    print(f"Table number: {table_num}")
+    print(f"Is bare: {is_bare}")
+    return (test_doc, caption, is_cont, table_num, is_bare)
 
 
 if __name__ == "__main__":

@@ -289,7 +289,16 @@ app = marimo.App(width="medium")
 @app.cell
 def _():
     import marimo as mo
-    return (mo,)
+    import pandas as pd
+    from markdown_table_extractor.core.merger import (
+        CONTINUATION_PATTERN,
+        is_continuation_table,
+        should_merge_tables,
+        merge_tables,
+        merge_two_tables,
+    )
+    from markdown_table_extractor.core.models import ExtractedTable, TableMergeStrategy
+    return (mo, pd, CONTINUATION_PATTERN, is_continuation_table, should_merge_tables, merge_tables, merge_two_tables, ExtractedTable, TableMergeStrategy)
 
 
 @app.cell
@@ -339,22 +348,20 @@ def _(mo):
 
 
 @app.cell
-def _():
-    import pandas as pd
-    
+def _(pd, ExtractedTable, merge_tables):
     # Create sample tables
     df1 = pd.DataFrame({"A": [1, 2], "B": [3, 4]})
     df2 = pd.DataFrame({"A": [5, 6], "B": [7, 8]})
-    
+
     t1 = ExtractedTable(df1, caption="Table 1. Data")
     t2 = ExtractedTable(df2, caption="Table 1 (Continued)", is_continuation=True)
-    
+
     print("Before merge:")
     print(f"  Table 1: {len(t1.dataframe)} rows")
     print(f"  Table 2: {len(t2.dataframe)} rows")
-    
+
     merged = merge_tables([t1, t2])
-    
+
     print(f"\nAfter merge:")
     print(f"  Result: {len(merged[0].dataframe)} rows")
     return (df1, df2, t1, t2, merged)

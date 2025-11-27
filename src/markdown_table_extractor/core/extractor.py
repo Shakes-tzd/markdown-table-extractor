@@ -247,7 +247,12 @@ app = marimo.App(width="medium")
 @app.cell
 def _():
     import marimo as mo
-    return (mo,)
+    from markdown_table_extractor.core.extractor import (
+        extract_tables,
+        extract_markdown_tables,
+        extract_single_table,
+    )
+    return (mo, extract_tables, extract_markdown_tables, extract_single_table)
 
 
 @app.cell
@@ -320,9 +325,9 @@ def _(sample_markdown):
 def _(result):
     # Show first table
     if result.tables:
-        table = result.tables[0]
-        print(f"Caption: {table.caption}")
-        table.dataframe
+        _table1 = result.tables[0]
+        print(f"Caption: {_table1.caption}")
+        _table1.dataframe
     return
 
 
@@ -330,9 +335,9 @@ def _(result):
 def _(result):
     # Show second table
     if len(result.tables) > 1:
-        table = result.tables[1]
-        print(f"Caption: {table.caption}")
-        table.dataframe
+        _table2 = result.tables[1]
+        print(f"Caption: {_table2.caption}")
+        _table2.dataframe
     return
 
 
