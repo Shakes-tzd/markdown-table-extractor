@@ -19,11 +19,11 @@ NOTEBOOKS_DIR = Path("src/markdown_table_extractor/core")
 OUTPUT_DIR = Path("_site")
 NOTEBOOKS = {
     "index.py": {"mode": "run", "output": OUTPUT_DIR, "name": "index"},
-    "parser.py": {"mode": "edit", "output": OUTPUT_DIR / "parser", "name": "parser"},
-    "cleaner.py": {"mode": "edit", "output": OUTPUT_DIR / "cleaner", "name": "cleaner"},
-    "merger.py": {"mode": "edit", "output": OUTPUT_DIR / "merger", "name": "merger"},
-    "extractor.py": {"mode": "edit", "output": OUTPUT_DIR / "extractor", "name": "extractor"},
-    "models.py": {"mode": "edit", "output": OUTPUT_DIR / "models", "name": "models"},
+    "parser.py": {"mode": "run", "output": OUTPUT_DIR / "parser", "name": "parser"},
+    "cleaner.py": {"mode": "run", "output": OUTPUT_DIR / "cleaner", "name": "cleaner"},
+    "merger.py": {"mode": "run", "output": OUTPUT_DIR / "merger", "name": "merger"},
+    "extractor.py": {"mode": "run", "output": OUTPUT_DIR / "extractor", "name": "extractor"},
+    "models.py": {"mode": "run", "output": OUTPUT_DIR / "models", "name": "models"},
 }
 
 
