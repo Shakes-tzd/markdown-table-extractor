@@ -1,0 +1,177 @@
+{
+  "version": "1",
+  "metadata": {
+    "marimo_version": "0.18.1"
+  },
+  "cells": [
+    {
+      "id": "Hbol",
+      "code_hash": "c0b7fccbb7d56b1c45b99c9b2d846610",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><h1 id=\"llm-powered-table-extraction\">\ud83e\udd16 LLM-Powered Table Extraction</h1>\n<span class=\"paragraph\">This module uses Simon Willison's <a href=\"https://llm.datasette.io/\" rel=\"noopener\" target=\"_blank\"><code>llm</code></a> library\nfor AI-powered table extraction.</span>\n<h2 id=\"why-use-llm-extraction\">Why use LLM extraction?</h2>\n<table>\n<thead>\n<tr>\n<th>Regex Extraction</th>\n<th>LLM Extraction</th>\n</tr>\n</thead>\n<tbody>\n<tr>\n<td>Fast, deterministic</td>\n<td>Slower, costs money</td>\n</tr>\n<tr>\n<td>Handles standard markdown</td>\n<td>Handles malformed tables</td>\n</tr>\n<tr>\n<td>Fails on edge cases</td>\n<td>Robust to variations</td>\n</tr>\n<tr>\n<td>No dependencies</td>\n<td>Requires API keys</td>\n</tr>\n</tbody>\n</table>\n<span class=\"paragraph\"><strong>Best approach:</strong> Use regex first, fall back to LLM for failures.</span>\n<h2 id=\"setup\">Setup</h2>\n<div class=\"language-bash codehilite\"><pre><span></span><code><span class=\"c1\"># Install core library</span>\npip<span class=\"w\"> </span>install<span class=\"w\"> </span>llm\n\n<span class=\"c1\"># Set up API key (stored securely)</span>\nllm<span class=\"w\"> </span>keys<span class=\"w\"> </span><span class=\"nb\">set</span><span class=\"w\"> </span>openai\n<span class=\"c1\"># or</span>\nllm<span class=\"w\"> </span>keys<span class=\"w\"> </span><span class=\"nb\">set</span><span class=\"w\"> </span>anthropic\n\n<span class=\"c1\"># Install additional providers</span>\nllm<span class=\"w\"> </span>install<span class=\"w\"> </span>llm-claude-3<span class=\"w\">     </span><span class=\"c1\"># Anthropic</span>\nllm<span class=\"w\"> </span>install<span class=\"w\"> </span>llm-ollama<span class=\"w\">       </span><span class=\"c1\"># Local models</span>\nllm<span class=\"w\"> </span>install<span class=\"w\"> </span>llm-gemini<span class=\"w\">       </span><span class=\"c1\"># Google</span>\n</code></pre></div>\n<h2 id=\"built-in-logging\">Built-in Logging</h2>\n<span class=\"paragraph\">Every LLM call is automatically logged to SQLite:</span>\n<div class=\"language-bash codehilite\"><pre><span></span><code><span class=\"c1\"># View recent prompts</span>\nllm<span class=\"w\"> </span>logs\n\n<span class=\"c1\"># Open in Datasette</span>\ndatasette<span class=\"w\"> </span><span class=\"s2\">&quot;</span><span class=\"k\">$(</span>llm<span class=\"w\"> </span>logs<span class=\"w\"> </span>path<span class=\"k\">)</span><span class=\"s2\">&quot;</span>\n</code></pre></div></span>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "MJUe",
+      "code_hash": "45346f15128e93406c451d010ad96c00",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><h2 id=\"output-schemas\">Output Schemas</h2>\n<span class=\"paragraph\">We define Pydantic models that the LLM will populate.\nThe <code>llm</code> library converts these to JSON Schema automatically.</span></span>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "PKri",
+      "code_hash": "a56bf99b6fd4a6c451a2697ff2ae03c8",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><h2 id=\"system-prompt\">System Prompt</h2>\n<span class=\"paragraph\">The prompt instructs the LLM on how to extract tables.</span></span>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "Xref",
+      "code_hash": "7473ca4d90fdc6d5a55da4bc9136bb47",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><h2 id=\"extract_with_llmtext-model_id\"><code>extract_with_llm(text, model_id)</code></h2>\n<span class=\"paragraph\">Main extraction function using the <code>llm</code> library.</span>\n<div class=\"language-python codehilite\"><pre><span></span><code><span class=\"kn\">from</span><span class=\"w\"> </span><span class=\"nn\">markdown_table_extractor.llm</span><span class=\"w\"> </span><span class=\"kn\">import</span> <span class=\"n\">extract_with_llm</span>\n\n<span class=\"n\">result</span> <span class=\"o\">=</span> <span class=\"n\">extract_with_llm</span><span class=\"p\">(</span><span class=\"n\">markdown_text</span><span class=\"p\">,</span> <span class=\"n\">model_id</span><span class=\"o\">=</span><span class=\"s2\">&quot;gpt-4o-mini&quot;</span><span class=\"p\">)</span>\n<span class=\"k\">for</span> <span class=\"n\">table</span> <span class=\"ow\">in</span> <span class=\"n\">result</span><span class=\"p\">:</span>\n    <span class=\"nb\">print</span><span class=\"p\">(</span><span class=\"n\">table</span><span class=\"o\">.</span><span class=\"n\">dataframe</span><span class=\"p\">)</span>\n</code></pre></div>\n<span class=\"paragraph\"><strong>Supported models</strong> (depends on installed plugins):</span>\n<ul>\n<li><code>gpt-4o-mini</code>, <code>gpt-4o</code>, <code>gpt-4-turbo</code> (OpenAI)</li>\n<li><code>claude-3-5-sonnet-latest</code>, <code>claude-3-5-haiku-latest</code> (Anthropic)</li>\n<li><code>gemini-1.5-flash</code>, <code>gemini-1.5-pro</code> (Google)</li>\n<li>Any Ollama model (local)</li>\n</ul></span>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "RGSE",
+      "code_hash": "db1ff38504a12d45d1db20702bd6701d",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><h2 id=\"llm_extracttext-model_id-simple-api\"><code>llm_extract(text, model_id)</code> - Simple API</h2>\n<span class=\"paragraph\">Returns just the DataFrames for quick usage.</span></span>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "emfo",
+      "code_hash": "22b9d2bf9957c9dc13957d045a98820b",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><h2 id=\"extract_tables_hybridtext-llm_model_id\"><code>extract_tables_hybrid(text, llm_model_id)</code></h2>\n<span class=\"paragraph\"><strong>Recommended approach:</strong> Try regex first, fall back to LLM.</span>\n<span class=\"paragraph\">This gives you:</span>\n<ul>\n<li>Speed for well-formed tables</li>\n<li>Robustness for edge cases</li>\n<li>Cost savings (only uses LLM when needed)</li>\n</ul></span>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "nWHF",
+      "code_hash": "189badfba7efc1baeedb69ab1378d6e8",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><hr />\n<h2 id=\"interactive-demo\">\ud83e\uddea Interactive Demo</h2>\n<span class=\"paragraph\">Test LLM extraction (requires <code>llm</code> library and API key):</span></span>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "setup",
+      "code_hash": "1d0db38904205bec4d6f6f6a1f6cec3e",
+      "outputs": [],
+      "console": []
+    },
+    {
+      "id": "vblA",
+      "code_hash": "b401557f3398bd329831f044de200c44",
+      "outputs": [],
+      "console": []
+    },
+    {
+      "id": "bkHC",
+      "code_hash": "df77bb682a5fd65af8432e6525ad328f",
+      "outputs": [],
+      "console": []
+    },
+    {
+      "id": "lEQa",
+      "code_hash": "61d1fe859c8e08e67dde0ada11255e5d",
+      "outputs": [],
+      "console": []
+    },
+    {
+      "id": "SFPL",
+      "code_hash": "de02717b23bef9dc8b557908199a71c2",
+      "outputs": [],
+      "console": []
+    },
+    {
+      "id": "BYtC",
+      "code_hash": "d9c8e8da9a7324bb3c61aa461c40dcf5",
+      "outputs": [],
+      "console": []
+    },
+    {
+      "id": "Kclp",
+      "code_hash": "38bdc5adbf085fe03fbf91a1edce48a8",
+      "outputs": [],
+      "console": []
+    },
+    {
+      "id": "Hstk",
+      "code_hash": "13292db0554460d5681c4ce2b312fd09",
+      "outputs": [],
+      "console": []
+    },
+    {
+      "id": "iLit",
+      "code_hash": "afbf8a2aff4829f9f3d1744151ef80cf",
+      "outputs": [],
+      "console": []
+    },
+    {
+      "id": "ZHCJ",
+      "code_hash": "1a9451a96bc8b0d250367085cca292d9",
+      "outputs": [],
+      "console": []
+    },
+    {
+      "id": "ROlb",
+      "code_hash": "02f6830f6c66981cb2eb67a3794187d4",
+      "outputs": [],
+      "console": []
+    },
+    {
+      "id": "qnkX",
+      "code_hash": "43f2867cc5a253cc476a2bb0e72bbf93",
+      "outputs": [],
+      "console": []
+    },
+    {
+      "id": "TqIu",
+      "code_hash": "652fc35a4a13fd9054ff6c6739133c08",
+      "outputs": [],
+      "console": []
+    }
+  ]
+}

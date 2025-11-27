@@ -1,0 +1,177 @@
+{
+  "version": "1",
+  "metadata": {
+    "marimo_version": "0.18.1"
+  },
+  "cells": [
+    {
+      "id": "setup",
+      "code_hash": "18636da83360e4512106c97b5de748d7",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/plain": ""
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "Hbol",
+      "code_hash": "0d17755bf4a52369a35d0c45d303a8c5",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><h1 id=\"table-merger\">\ud83d\udd17 Table Merger</h1>\n<span class=\"paragraph\">This module handles automatic merging of continuation tables.</span>\n<h2 id=\"the-continuation-problem\">The Continuation Problem</h2>\n<span class=\"paragraph\">Academic manuscripts often split large tables across pages:</span>\n<div class=\"language-markdown codehilite\"><pre><span></span><code>Table 3. Study Results\n| Study | Outcome |\n|-------|---------|\n| A     | Good    |\n| B     | Fair    |\n\nTable 3. (Continued)\n| Study | Outcome |\n|-------|---------|\n| C     | Good    |\n| D     | Poor    |\n</code></pre></div>\n<span class=\"paragraph\">These should be <strong>merged</strong> into a single table with 4 rows.</span>\n<h2 id=\"merge-strategies\">Merge Strategies</h2>\n<table>\n<thead>\n<tr>\n<th>Strategy</th>\n<th>When to Merge</th>\n</tr>\n</thead>\n<tbody>\n<tr>\n<td><code>NONE</code></td>\n<td>Never merge</td>\n</tr>\n<tr>\n<td><code>IDENTICAL_HEADERS</code></td>\n<td>Headers match (70%+ similarity)</td>\n</tr>\n<tr>\n<td><code>COMPATIBLE_COLUMNS</code></td>\n<td>Column counts within \u00b12</td>\n</tr>\n</tbody>\n</table></span>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "MJUe",
+      "code_hash": "5a02fe0637dae38bde3c0ab5fd532e9c",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><h2 id=\"should_merge_tablescurrent-next_table-strategy-max_line_gap\"><code>should_merge_tables(current, next_table, strategy, max_line_gap)</code></h2>\n<span class=\"paragraph\">Determines if two adjacent tables should be combined.</span>\n<span class=\"paragraph\"><strong>Merge if ANY of these are true:</strong></span>\n<ol>\n<li>Next table has <code>is_continuation=True</code></li>\n<li>Next table's caption contains \"continued\"</li>\n<li>Headers match according to strategy</li>\n</ol>\n<span class=\"paragraph\"><strong>Don't merge if:</strong></span>\n<ul>\n<li>Tables are too far apart (&gt;15 lines by default)</li>\n<li>Strategy is <code>NONE</code></li>\n</ul></span>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "vblA",
+      "code_hash": "970aa6f4098efaa5c03bc735b547753e",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/plain": ""
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "bkHC",
+      "code_hash": "7ba7504a79f81289e8789624ed63807e",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><h2 id=\"merge_dataframesdataframes-base_columns\"><code>merge_dataframes(dataframes, base_columns)</code></h2>\n<span class=\"paragraph\">Low-level function to combine multiple DataFrames.</span>\n<span class=\"paragraph\"><strong>Handles column mismatches:</strong></span>\n<ul>\n<li>Missing columns \u2192 filled with empty string</li>\n<li>Extra columns \u2192 truncated to match base</li>\n<li>Column order \u2192 aligned to base_columns</li>\n</ul></span>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "lEQa",
+      "code_hash": "8284bac64a8593c65d59e582f0e00a0c",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/plain": ""
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "PKri",
+      "code_hash": "25e055b2c5185d14ab019aac1047082e",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><h2 id=\"merge_tablestables-strategy\"><code>merge_tables(tables, strategy)</code></h2>\n<span class=\"paragraph\">Main entry point for table merging.</span>\n<span class=\"paragraph\"><strong>Algorithm:</strong></span>\n<ol>\n<li>Iterate through tables sequentially</li>\n<li>For each table, look ahead for mergeable tables</li>\n<li>Combine consecutive mergeable tables</li>\n<li>Return reduced list</li>\n</ol>\n<div class=\"language-python codehilite\"><pre><span></span><code><span class=\"c1\"># Before: [Table3, Table3_cont, Table4]</span>\n<span class=\"c1\"># After:  [Table3_merged, Table4]</span>\n</code></pre></div></span>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "SFPL",
+      "code_hash": "f223ed003d18a03a2d037d7765366ac4",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/plain": ""
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "Xref",
+      "code_hash": "82c47f703a3cb7c7fd53c841b57ecc1b",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/plain": ""
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "BYtC",
+      "code_hash": "e42db4e9cd2a8b8c0cd99050015f7fda",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><hr />\n<h2 id=\"interactive-demo\">\ud83e\uddea Interactive Demo</h2>\n<span class=\"paragraph\">See table merging in action:</span></span>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "RGSE",
+      "code_hash": "bb0c64abfc6536766ba175aef912745b",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><h3 id=\"before-merge\">Before Merge</h3>\n<span class=\"paragraph\"><strong>Table 1:</strong> Table 3. Study Results</span>\n<ul>\n<li>Rows: 2</li>\n<li>Lines: 10-15</li>\n</ul>\n<span class=\"paragraph\"><strong>Table 2:</strong> Table 3. (Continued)</span>\n<ul>\n<li>Rows: 2</li>\n<li>is_continuation: True</li>\n</ul></span>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "Kclp",
+      "code_hash": "ea1f37e0d8002fcba9b4b899a68bf922",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/html": "<div style='display: flex;flex: 1;flex-direction: column;justify-content: flex-start;align-items: normal;flex-wrap: nowrap;gap: 0.5rem'><span class=\"markdown prose dark:prose-invert contents\"><h3 id=\"after-merge\">After Merge</h3>\n<span class=\"paragraph\"><strong>Result:</strong> 2 tables \u2192 1 table</span>\n<span class=\"paragraph\"><strong>Merged table:</strong></span>\n<ul>\n<li>Caption: Table 3. Study Results</li>\n<li>Rows: 4</li>\n<li>Lines: 10-25</li>\n</ul></span><marimo-ui-element object-id='Kclp-0' random-id='6b398b96-fe75-9f9a-2c7e-3f0aed42aef9'><marimo-table data-initial-value='[]' data-label='null' data-data='&quot;[{&#92;&quot;_marimo_row_id&#92;&quot;:0,&#92;&quot;Study&#92;&quot;:&#92;&quot;Smith 2020&#92;&quot;,&#92;&quot;Outcome&#92;&quot;:&#92;&quot;Good&#92;&quot;},{&#92;&quot;_marimo_row_id&#92;&quot;:1,&#92;&quot;Study&#92;&quot;:&#92;&quot;Jones 2019&#92;&quot;,&#92;&quot;Outcome&#92;&quot;:&#92;&quot;Fair&#92;&quot;},{&#92;&quot;_marimo_row_id&#92;&quot;:2,&#92;&quot;Study&#92;&quot;:&#92;&quot;Lee 2021&#92;&quot;,&#92;&quot;Outcome&#92;&quot;:&#92;&quot;Good&#92;&quot;},{&#92;&quot;_marimo_row_id&#92;&quot;:3,&#92;&quot;Study&#92;&quot;:&#92;&quot;Garcia 2018&#92;&quot;,&#92;&quot;Outcome&#92;&quot;:&#92;&quot;Poor&#92;&quot;}]&quot;' data-total-rows='4' data-total-columns='2' data-max-columns='50' data-banner-text='&quot;&quot;' data-pagination='false' data-page-size='10' data-field-types='[[&quot;Study&quot;,[&quot;string&quot;,&quot;object&quot;]],[&quot;Outcome&quot;,[&quot;string&quot;,&quot;object&quot;]]]' data-selection='&quot;multi&quot;' data-show-filters='true' data-show-download='true' data-show-column-summaries='false' data-show-data-types='true' data-show-page-size-selector='false' data-show-column-explorer='true' data-show-chart-builder='true' data-row-headers='[]' data-has-stable-row-id='true' data-lazy='false' data-preload='false'></marimo-table></marimo-ui-element></div>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "zzNi",
+      "code_hash": null,
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/plain": ""
+          }
+        }
+      ],
+      "console": []
+    }
+  ]
+}

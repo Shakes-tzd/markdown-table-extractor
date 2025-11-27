@@ -1,0 +1,229 @@
+{
+  "version": "1",
+  "metadata": {
+    "marimo_version": "0.18.1"
+  },
+  "cells": [
+    {
+      "id": "Hbol",
+      "code_hash": "2c437a5c379621facc614af06889e8fa",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><h1 id=\"data-cleaner\">\ud83e\uddf9 Data Cleaner</h1>\n<span class=\"paragraph\">This module handles cleaning of extracted table data.</span>\n<h2 id=\"common-issues-in-manuscript-tables\">Common Issues in Manuscript Tables</h2>\n<table>\n<thead>\n<tr>\n<th>Issue</th>\n<th>Example</th>\n<th>Solution</th>\n</tr>\n</thead>\n<tbody>\n<tr>\n<td>HTML tags</td>\n<td><code>Mean &lt;br&gt; Age</code></td>\n<td>Remove tags \u2192 <code>Mean Age</code></td>\n</tr>\n<tr>\n<td>Multiple spaces</td>\n<td><code>Follow-Up  (mo)</code></td>\n<td>Normalize \u2192 <code>Follow-Up (mo)</code></td>\n</tr>\n<tr>\n<td>LaTeX artifacts</td>\n<td><code>$\\checkmark$</code></td>\n<td>Convert \u2192 <code>\u2713</code></td>\n</tr>\n</tbody>\n</table>\n<span class=\"paragraph\">These issues commonly occur when PDFs are converted to markdown.</span></span>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "MJUe",
+      "code_hash": "795df6d6805f722ac70d576bd4c871ff",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><h2 id=\"clean_column_namename\"><code>clean_column_name(name)</code></h2>\n<span class=\"paragraph\">The workhorse function for cleaning column headers.</span>\n<span class=\"paragraph\"><strong>What it removes:</strong></span>\n<ul>\n<li>HTML tags: <code>&lt;br&gt;</code>, <code>&lt;span&gt;</code>, etc.</li>\n<li>Multiple consecutive spaces</li>\n<li>Leading/trailing whitespace</li>\n</ul>\n<div class=\"language-python codehilite\"><pre><span></span><code><span class=\"o\">&gt;&gt;&gt;</span> <span class=\"n\">clean_column_name</span><span class=\"p\">(</span><span class=\"s2\">&quot;Mean &lt;br&gt; Age (yr)&quot;</span><span class=\"p\">)</span>\n<span class=\"s1\">&#39;Mean Age (yr)&#39;</span>\n</code></pre></div></span>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "bkHC",
+      "code_hash": "8cbe10faedbbebd9ae38198141be53d6",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><h2 id=\"clean_cell_valuevalue\"><code>clean_cell_value(value)</code></h2>\n<span class=\"paragraph\">Simple cleaning for cell data values.</span></span>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "PKri",
+      "code_hash": "2096845713e14a99e2d52c10e1a25dd4",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><h2 id=\"normalize_headersheaders\"><code>normalize_headers(headers)</code></h2>\n<span class=\"paragraph\">Creates canonical form of headers for comparison.\nUsed when determining if two tables should be merged.</span>\n<span class=\"paragraph\"><strong>Normalization steps:</strong></span>\n<ol>\n<li>Apply <code>clean_column_name()</code></li>\n<li>Convert to lowercase</li>\n<li>Remove special characters</li>\n<li>Collapse multiple spaces</li>\n</ol>\n<div class=\"language-python codehilite\"><pre><span></span><code><span class=\"o\">&gt;&gt;&gt;</span> <span class=\"n\">normalize_headers</span><span class=\"p\">([</span><span class=\"s2\">&quot;Mean Age (yr)&quot;</span><span class=\"p\">,</span> <span class=\"s2\">&quot;Follow-Up (mo)&quot;</span><span class=\"p\">])</span>\n<span class=\"p\">[</span><span class=\"s1\">&#39;mean age yr&#39;</span><span class=\"p\">,</span> <span class=\"s1\">&#39;followup mo&#39;</span><span class=\"p\">]</span>\n</code></pre></div></span>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "SFPL",
+      "code_hash": "f9de6dca77959d815acb93d0540079d2",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><h2 id=\"headers_matchheaders1-headers2-tolerance-similarity_threshold\"><code>headers_match(headers1, headers2, tolerance, similarity_threshold)</code></h2>\n<span class=\"paragraph\">Determines if two header lists are \"close enough\" to merge tables.</span>\n<span class=\"paragraph\"><strong>Parameters:</strong></span>\n<ul>\n<li><code>tolerance</code>: Max column count difference allowed (default: 2)</li>\n<li><code>similarity_threshold</code>: Min fraction of matching columns (default: 0.7)</li>\n</ul>\n<span class=\"paragraph\"><strong>Use cases:</strong></span>\n<ul>\n<li>Table continuations may have slightly different formatting</li>\n<li>Some tables split across pages lose/gain columns</li>\n</ul></span>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "RGSE",
+      "code_hash": "1a6be75ff6fa1b897c8dafe7aed4aad7",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><h2 id=\"remove_latex_artifactstext\"><code>remove_latex_artifacts(text)</code></h2>\n<span class=\"paragraph\">Handles LaTeX that survives PDF\u2192Markdown conversion.</span>\n<span class=\"paragraph\"><strong>Conversions:</strong></span>\n<ul>\n<li><code>$\\checkmark$</code> \u2192 <code>\u2713</code></li>\n<li><code>$\\sqrt{}$</code> \u2192 <code>\u2713</code></li>\n<li><code>^{23}</code> \u2192 <code>[23]</code> (superscript references)</li>\n</ul></span>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "emfo",
+      "code_hash": "69fb613fcd7870f19db8aebcb8635e7f",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><hr />\n<h2 id=\"interactive-demo\">\ud83e\uddea Interactive Demo</h2>\n<span class=\"paragraph\">Test the cleaning functions:</span></span>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "setup",
+      "code_hash": "9e7cd3a291042dd07079a608f70b8710",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/plain": ""
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "vblA",
+      "code_hash": "35b6fbf4e3dd66b5a25dcb4e502999b0",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/plain": ""
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "lEQa",
+      "code_hash": "b37a3d9587203ed88301d002b57b0894",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/plain": ""
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "Xref",
+      "code_hash": "45893a6ee57990ff55af624d4bee5aa3",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/plain": ""
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "BYtC",
+      "code_hash": "dc972b2da41da40178a5e94aa7b8bcb5",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/plain": ""
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "Kclp",
+      "code_hash": "1acd4ef21a811c5e260ed271c6f1a199",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/plain": ""
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "Hstk",
+      "code_hash": "174673fb351d7f4c7daa79249bb1064c",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/html": "<div style='display: flex;flex: 1;flex-direction: column;justify-content: flex-start;align-items: normal;flex-wrap: nowrap;gap: 0.5rem'><span class=\"markdown prose dark:prose-invert contents\"><h3 id=\"column-name-cleaning\">Column Name Cleaning</h3></span><marimo-ui-element object-id='Hstk-0' random-id='4b078e18-f461-b9ef-6c80-3c129edccc78'><marimo-table data-initial-value='[]' data-label='null' data-data='&quot;[{&#92;&quot;_marimo_row_id&#92;&quot;:0,&#92;&quot;Original&#92;&quot;:&#92;&quot;`Mean &lt;br&gt; Age (yr)`&#92;&quot;,&#92;&quot;Cleaned&#92;&quot;:&#92;&quot;`Mean Age (yr)`&#92;&quot;},{&#92;&quot;_marimo_row_id&#92;&quot;:1,&#92;&quot;Original&#92;&quot;:&#92;&quot;`Follow-Up  (mo)`&#92;&quot;,&#92;&quot;Cleaned&#92;&quot;:&#92;&quot;`Follow-Up (mo)`&#92;&quot;},{&#92;&quot;_marimo_row_id&#92;&quot;:2,&#92;&quot;Original&#92;&quot;:&#92;&quot;`Donor-Site &lt;br&gt; Morbidity`&#92;&quot;,&#92;&quot;Cleaned&#92;&quot;:&#92;&quot;`Donor-Site Morbidity`&#92;&quot;},{&#92;&quot;_marimo_row_id&#92;&quot;:3,&#92;&quot;Original&#92;&quot;:&#92;&quot;`Sample&lt;br&gt;Size`&#92;&quot;,&#92;&quot;Cleaned&#92;&quot;:&#92;&quot;`Sample Size`&#92;&quot;},{&#92;&quot;_marimo_row_id&#92;&quot;:4,&#92;&quot;Original&#92;&quot;:&#92;&quot;`  Extra Spaces  `&#92;&quot;,&#92;&quot;Cleaned&#92;&quot;:&#92;&quot;`Extra Spaces`&#92;&quot;}]&quot;' data-total-rows='5' data-total-columns='2' data-max-columns='50' data-banner-text='&quot;&quot;' data-pagination='false' data-page-size='10' data-field-types='[[&quot;Original&quot;,[&quot;string&quot;,&quot;object&quot;]],[&quot;Cleaned&quot;,[&quot;string&quot;,&quot;object&quot;]]]' data-selection='&quot;multi&quot;' data-show-filters='true' data-show-download='true' data-show-column-summaries='false' data-show-data-types='true' data-show-page-size-selector='false' data-show-column-explorer='true' data-show-chart-builder='true' data-row-headers='[]' data-has-stable-row-id='true' data-lazy='false' data-preload='false'></marimo-table></marimo-ui-element></div>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "nWHF",
+      "code_hash": "01aa33d6ea1fb02b0c4c22c7c09bb097",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/html": "<div style='display: flex;flex: 1;flex-direction: column;justify-content: flex-start;align-items: normal;flex-wrap: nowrap;gap: 0.5rem'><span class=\"markdown prose dark:prose-invert contents\"><h3 id=\"header-matching\">Header Matching</h3></span><marimo-ui-element object-id='nWHF-0' random-id='2fe5ec21-a366-b776-6bd1-89ca754100d7'><marimo-table data-initial-value='[]' data-label='null' data-data='&quot;[{&#92;&quot;_marimo_row_id&#92;&quot;:0,&#92;&quot;Headers 1&#92;&quot;:&#92;&quot;[&#x27;Study&#x27;, &#x27;Year&#x27;, &#x27;N&#x27;]&#92;&quot;,&#92;&quot;Headers 2&#92;&quot;:&#92;&quot;[&#x27;Study&#x27;, &#x27;Year&#x27;, &#x27;N&#x27;]&#92;&quot;,&#92;&quot;Match&#92;&quot;:true,&#92;&quot;Description&#92;&quot;:&#92;&quot;Identical&#92;&quot;},{&#92;&quot;_marimo_row_id&#92;&quot;:1,&#92;&quot;Headers 1&#92;&quot;:&#92;&quot;[&#x27;Study&#x27;, &#x27;Year&#x27;]&#92;&quot;,&#92;&quot;Headers 2&#92;&quot;:&#92;&quot;[&#x27;Study&#x27;, &#x27;Year&#x27;, &#x27;N&#x27;, &#x27;Outcome&#x27;]&#92;&quot;,&#92;&quot;Match&#92;&quot;:true,&#92;&quot;Description&#92;&quot;:&#92;&quot;Extra columns&#92;&quot;},{&#92;&quot;_marimo_row_id&#92;&quot;:2,&#92;&quot;Headers 1&#92;&quot;:&#92;&quot;[&#x27;Study&#x27;, &#x27;Year&#x27;]&#92;&quot;,&#92;&quot;Headers 2&#92;&quot;:&#92;&quot;[&#x27;Author&#x27;, &#x27;Date&#x27;]&#92;&quot;,&#92;&quot;Match&#92;&quot;:false,&#92;&quot;Description&#92;&quot;:&#92;&quot;Different names&#92;&quot;},{&#92;&quot;_marimo_row_id&#92;&quot;:3,&#92;&quot;Headers 1&#92;&quot;:&#92;&quot;[&#x27;Mean Age (yr)&#x27;]&#92;&quot;,&#92;&quot;Headers 2&#92;&quot;:&#92;&quot;[&#x27;mean age yr&#x27;]&#92;&quot;,&#92;&quot;Match&#92;&quot;:true,&#92;&quot;Description&#92;&quot;:&#92;&quot;Formatting diff&#92;&quot;}]&quot;' data-total-rows='4' data-total-columns='4' data-max-columns='50' data-banner-text='&quot;&quot;' data-pagination='false' data-page-size='10' data-field-types='[[&quot;Headers 1&quot;,[&quot;string&quot;,&quot;object&quot;]],[&quot;Headers 2&quot;,[&quot;string&quot;,&quot;object&quot;]],[&quot;Match&quot;,[&quot;boolean&quot;,&quot;bool&quot;]],[&quot;Description&quot;,[&quot;string&quot;,&quot;object&quot;]]]' data-selection='&quot;multi&quot;' data-show-filters='true' data-show-download='true' data-show-column-summaries='false' data-show-data-types='true' data-show-page-size-selector='false' data-show-column-explorer='true' data-show-chart-builder='true' data-row-headers='[]' data-has-stable-row-id='true' data-lazy='false' data-preload='false'></marimo-table></marimo-ui-element></div>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "iLit",
+      "code_hash": "c77f99edfdd58855de7f677e67ab07d8",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/html": "<div style='display: flex;flex: 1;flex-direction: column;justify-content: flex-start;align-items: normal;flex-wrap: nowrap;gap: 0.5rem'><span class=\"markdown prose dark:prose-invert contents\"><h3 id=\"latex-cleaning\">LaTeX Cleaning</h3></span><marimo-ui-element object-id='iLit-0' random-id='003a5bb8-9415-b8e3-72ea-167bb5c77c52'><marimo-table data-initial-value='[]' data-label='null' data-data='&quot;[{&#92;&quot;_marimo_row_id&#92;&quot;:0,&#92;&quot;Original&#92;&quot;:&#92;&quot;`&#36;&#92;&#92;&#92;&#92;checkmark&#36;`&#92;&quot;,&#92;&quot;Cleaned&#92;&quot;:&#92;&quot;`&#92;&#92;u2713`&#92;&quot;},{&#92;&quot;_marimo_row_id&#92;&quot;:1,&#92;&quot;Original&#92;&quot;:&#92;&quot;`&#36;&#92;&#92;&#92;&#92;sqrt{ }&#36;`&#92;&quot;,&#92;&quot;Cleaned&#92;&quot;:&#92;&quot;`&#92;&#92;u2713`&#92;&quot;},{&#92;&quot;_marimo_row_id&#92;&quot;:2,&#92;&quot;Original&#92;&quot;:&#92;&quot;`Yes&#36;^{23}&#36;`&#92;&quot;,&#92;&quot;Cleaned&#92;&quot;:&#92;&quot;`Yes[23]`&#92;&quot;},{&#92;&quot;_marimo_row_id&#92;&quot;:3,&#92;&quot;Original&#92;&quot;:&#92;&quot;`Normal text`&#92;&quot;,&#92;&quot;Cleaned&#92;&quot;:&#92;&quot;`Normal text`&#92;&quot;}]&quot;' data-total-rows='4' data-total-columns='2' data-max-columns='50' data-banner-text='&quot;&quot;' data-pagination='false' data-page-size='10' data-field-types='[[&quot;Original&quot;,[&quot;string&quot;,&quot;object&quot;]],[&quot;Cleaned&quot;,[&quot;string&quot;,&quot;object&quot;]]]' data-selection='&quot;multi&quot;' data-show-filters='true' data-show-download='true' data-show-column-summaries='false' data-show-data-types='true' data-show-page-size-selector='false' data-show-column-explorer='true' data-show-chart-builder='true' data-row-headers='[]' data-has-stable-row-id='true' data-lazy='false' data-preload='false'></marimo-table></marimo-ui-element></div>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "ZHCJ",
+      "code_hash": null,
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/plain": ""
+          }
+        }
+      ],
+      "console": []
+    }
+  ]
+}

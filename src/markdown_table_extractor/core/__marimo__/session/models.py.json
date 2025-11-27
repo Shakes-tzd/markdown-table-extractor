@@ -1,0 +1,151 @@
+{
+  "version": "1",
+  "metadata": {
+    "marimo_version": "0.18.1"
+  },
+  "cells": [
+    {
+      "id": "Hbol",
+      "code_hash": "f002de70bd660e53adfe74e37842ee80",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><h1 id=\"data-models\">\ud83d\udce6 Data Models</h1>\n<span class=\"paragraph\">This module defines the core data structures for table extraction:</span>\n<table>\n<thead>\n<tr>\n<th>Class</th>\n<th>Purpose</th>\n</tr>\n</thead>\n<tbody>\n<tr>\n<td><code>TableMergeStrategy</code></td>\n<td>Enum controlling how adjacent tables are merged</td>\n</tr>\n<tr>\n<td><code>ExtractedTable</code></td>\n<td>Single table with metadata (caption, position, etc.)</td>\n</tr>\n<tr>\n<td><code>ExtractionResult</code></td>\n<td>Collection of tables with error tracking</td>\n</tr>\n</tbody>\n</table>\n<span class=\"paragraph\">All classes are importable:\n<div class=\"language-python codehilite\"><pre><span></span><code><span class=\"kn\">from</span><span class=\"w\"> </span><span class=\"nn\">markdown_table_extractor.core.models</span><span class=\"w\"> </span><span class=\"kn\">import</span> <span class=\"n\">ExtractedTable</span><span class=\"p\">,</span> <span class=\"n\">TableMergeStrategy</span>\n</code></pre></div></span></span>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "MJUe",
+      "code_hash": "2605045d827f2694ea97e119d4eca96d",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><h2 id=\"tablemergestrategy\">TableMergeStrategy</h2>\n<span class=\"paragraph\">Controls how the extractor handles adjacent tables that may be continuations\nof each other (e.g., \"Table 3 (Continued)\").</span>\n<table>\n<thead>\n<tr>\n<th>Strategy</th>\n<th>Behavior</th>\n</tr>\n</thead>\n<tbody>\n<tr>\n<td><code>NONE</code></td>\n<td>Never merge tables</td>\n</tr>\n<tr>\n<td><code>IDENTICAL_HEADERS</code></td>\n<td>Merge if headers match (default)</td>\n</tr>\n<tr>\n<td><code>COMPATIBLE_COLUMNS</code></td>\n<td>Merge if column counts are similar</td>\n</tr>\n</tbody>\n</table></span>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "bkHC",
+      "code_hash": "a10e1bd5ba873ccc2a87327a4ffa6ffd",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><h2 id=\"extractedtable\">ExtractedTable</h2>\n<span class=\"paragraph\">Represents a single extracted table with all its metadata.</span>\n<span class=\"paragraph\"><strong>Key attributes:</strong></span>\n<ul>\n<li><code>dataframe</code>: The actual data as a pandas DataFrame</li>\n<li><code>caption</code>: Detected caption like \"Table 3. Results\"</li>\n<li><code>is_continuation</code>: True if marked as \"(Continued)\"</li>\n<li><code>start_line</code> / <code>end_line</code>: Position in source document</li>\n</ul>\n<span class=\"paragraph\"><strong>Computed properties:</strong></span>\n<ul>\n<li><code>row_count</code>: Number of data rows</li>\n<li><code>column_count</code>: Number of columns</li>\n</ul></span>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "PKri",
+      "code_hash": "1b59cc8b71e42e35c49f268dd8bd8789",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><h2 id=\"extractionresult\">ExtractionResult</h2>\n<span class=\"paragraph\">Container for all extraction results from a document.</span>\n<span class=\"paragraph\"><strong>Supports iteration:</strong>\n<div class=\"language-python codehilite\"><pre><span></span><code><span class=\"k\">for</span> <span class=\"n\">table</span> <span class=\"ow\">in</span> <span class=\"n\">result</span><span class=\"p\">:</span>\n    <span class=\"nb\">print</span><span class=\"p\">(</span><span class=\"n\">table</span><span class=\"o\">.</span><span class=\"n\">caption</span><span class=\"p\">)</span>\n</code></pre></div></span>\n<span class=\"paragraph\"><strong>Supports indexing:</strong>\n<div class=\"language-python codehilite\"><pre><span></span><code><span class=\"n\">first_table</span> <span class=\"o\">=</span> <span class=\"n\">result</span><span class=\"p\">[</span><span class=\"mi\">0</span><span class=\"p\">]</span>\n</code></pre></div></span>\n<span class=\"paragraph\"><strong>Get just DataFrames:</strong>\n<div class=\"language-python codehilite\"><pre><span></span><code><span class=\"n\">dfs</span> <span class=\"o\">=</span> <span class=\"n\">result</span><span class=\"o\">.</span><span class=\"n\">get_dataframes</span><span class=\"p\">()</span>  <span class=\"c1\"># list[pd.DataFrame]</span>\n</code></pre></div></span></span>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "SFPL",
+      "code_hash": "bcef538152134adf891988bc52a0f947",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><hr />\n<h2 id=\"interactive-demo\">\ud83e\uddea Interactive Demo</h2>\n<span class=\"paragraph\">Try creating instances of the data models:</span></span>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "setup",
+      "code_hash": "579a9980cbe9d061e8079bc2d22668f4",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/plain": ""
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "vblA",
+      "code_hash": "1e65dec35973f67ef3858c3bf9b4ef70",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/plain": ""
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "lEQa",
+      "code_hash": "bd0efb10e6d3b855b9217223951cb0dc",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/plain": ""
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "Xref",
+      "code_hash": "dfa2f2df8ac1754b3ca651fe9f104827",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/plain": ""
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "BYtC",
+      "code_hash": "a37a59e2aff1f70825bf94c3690f4d84",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><span class=\"paragraph\"><strong>Created table:</strong></span>\n<ul>\n<li>Caption: <code>Table 1. Study Results</code></li>\n<li>Shape: <code>(2, 3)</code></li>\n<li>Lines: 10-15</li>\n</ul></span>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "RGSE",
+      "code_hash": "396ce9d12a806649110bf61416b83b2b",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/html": "<div style='display: flex;flex: 1;flex-direction: column;justify-content: flex-start;align-items: normal;flex-wrap: nowrap;gap: 0.5rem'><span class=\"markdown prose dark:prose-invert contents\"><span class=\"paragraph\"><strong>ExtractionResult:</strong> <code>ExtractionResult(tables=1)</code></span></span><marimo-ui-element object-id='RGSE-0' random-id='8fef1340-236c-728d-882a-9aef965167f0'><marimo-table data-initial-value='[]' data-label='null' data-data='&quot;[{&#92;&quot;_marimo_row_id&#92;&quot;:0,&#92;&quot;Study&#92;&quot;:&#92;&quot;Smith 2020&#92;&quot;,&#92;&quot;Outcome&#92;&quot;:&#92;&quot;Positive&#92;&quot;,&#92;&quot;N&#92;&quot;:45},{&#92;&quot;_marimo_row_id&#92;&quot;:1,&#92;&quot;Study&#92;&quot;:&#92;&quot;Jones 2019&#92;&quot;,&#92;&quot;Outcome&#92;&quot;:&#92;&quot;Negative&#92;&quot;,&#92;&quot;N&#92;&quot;:120}]&quot;' data-total-rows='2' data-total-columns='3' data-max-columns='50' data-banner-text='&quot;&quot;' data-pagination='false' data-page-size='10' data-field-types='[[&quot;Study&quot;,[&quot;string&quot;,&quot;object&quot;]],[&quot;Outcome&quot;,[&quot;string&quot;,&quot;object&quot;]],[&quot;N&quot;,[&quot;integer&quot;,&quot;int64&quot;]]]' data-selection='&quot;multi&quot;' data-show-filters='true' data-show-download='true' data-show-column-summaries='false' data-show-data-types='true' data-show-page-size-selector='false' data-show-column-explorer='true' data-show-chart-builder='true' data-row-headers='[]' data-has-stable-row-id='true' data-lazy='false' data-preload='false'></marimo-table></marimo-ui-element></div>"
+          }
+        }
+      ],
+      "console": []
+    }
+  ]
+}
