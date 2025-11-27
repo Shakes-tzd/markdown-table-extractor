@@ -33,53 +33,47 @@ jobs:
         run: |
           uv pip install --system marimo pandas tabulate
 
-      - name: Export index (main documentation) - creates _site with assets
+      - name: Export index (main documentation)
         run: |
-          uv run marimo export html-wasm \
+          uv run marimo export html \
             src/markdown_table_extractor/core/index.py \
             -o _site/index.html \
-            --mode run \
-            --no-show-code
+            --no-include-code
 
       - name: Export parser notebook
         run: |
-          uv run marimo export html-wasm \
+          uv run marimo export html \
             src/markdown_table_extractor/core/parser.py \
             -o _site/parser.html \
-            --mode run \
-            --no-show-code
+            --no-include-code
 
       - name: Export cleaner notebook
         run: |
-          uv run marimo export html-wasm \
+          uv run marimo export html \
             src/markdown_table_extractor/core/cleaner.py \
             -o _site/cleaner.html \
-            --mode run \
-            --no-show-code
+            --no-include-code
 
       - name: Export merger notebook
         run: |
-          uv run marimo export html-wasm \
+          uv run marimo export html \
             src/markdown_table_extractor/core/merger.py \
             -o _site/merger.html \
-            --mode run \
-            --no-show-code
+            --no-include-code
 
       - name: Export extractor notebook
         run: |
-          uv run marimo export html-wasm \
+          uv run marimo export html \
             src/markdown_table_extractor/core/extractor.py \
             -o _site/extractor.html \
-            --mode run \
-            --no-show-code
+            --no-include-code
 
       - name: Export models notebook
         run: |
-          uv run marimo export html-wasm \
+          uv run marimo export html \
             src/markdown_table_extractor/core/models.py \
             -o _site/models.html \
-            --mode run \
-            --no-show-code
+            --no-include-code
 
       - name: Create .nojekyll
         run: touch _site/.nojekyll
