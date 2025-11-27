@@ -33,50 +33,53 @@ jobs:
         run: |
           uv pip install --system marimo pandas tabulate
 
-      - name: Create output directory
-        run: mkdir -p _site
-
-      - name: Export index (main documentation)
+      - name: Export index (main documentation) - creates _site with assets
         run: |
-          uv run marimo export html \
+          uv run marimo export html-wasm \
             src/markdown_table_extractor/core/index.py \
             -o _site/index.html \
-            --no-include-code
+            --mode run \
+            --no-show-code
 
       - name: Export parser notebook
         run: |
-          uv run marimo export html \
+          uv run marimo export html-wasm \
             src/markdown_table_extractor/core/parser.py \
             -o _site/parser.html \
-            --no-include-code
+            --mode run \
+            --no-show-code
 
       - name: Export cleaner notebook
         run: |
-          uv run marimo export html \
+          uv run marimo export html-wasm \
             src/markdown_table_extractor/core/cleaner.py \
             -o _site/cleaner.html \
-            --no-include-code
+            --mode run \
+            --no-show-code
 
       - name: Export merger notebook
         run: |
-          uv run marimo export html \
+          uv run marimo export html-wasm \
             src/markdown_table_extractor/core/merger.py \
             -o _site/merger.html \
-            --no-include-code
+            --mode run \
+            --no-show-code
 
       - name: Export extractor notebook
         run: |
-          uv run marimo export html \
+          uv run marimo export html-wasm \
             src/markdown_table_extractor/core/extractor.py \
             -o _site/extractor.html \
-            --no-include-code
+            --mode run \
+            --no-show-code
 
       - name: Export models notebook
         run: |
-          uv run marimo export html \
+          uv run marimo export html-wasm \
             src/markdown_table_extractor/core/models.py \
             -o _site/models.html \
-            --no-include-code
+            --mode run \
+            --no-show-code
 
       - name: Create .nojekyll
         run: touch _site/.nojekyll
