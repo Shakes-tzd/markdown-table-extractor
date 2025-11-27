@@ -18,12 +18,12 @@ from pathlib import Path
 NOTEBOOKS_DIR = Path("src/markdown_table_extractor/core")
 OUTPUT_DIR = Path("_site")
 NOTEBOOKS = {
-    "index.py": {"mode": "run", "output": OUTPUT_DIR, "name": "index"},
-    "parser.py": {"mode": "run", "output": OUTPUT_DIR / "parser", "name": "parser"},
-    "cleaner.py": {"mode": "run", "output": OUTPUT_DIR / "cleaner", "name": "cleaner"},
-    "merger.py": {"mode": "run", "output": OUTPUT_DIR / "merger", "name": "merger"},
-    "extractor.py": {"mode": "run", "output": OUTPUT_DIR / "extractor", "name": "extractor"},
-    "models.py": {"mode": "run", "output": OUTPUT_DIR / "models", "name": "models"},
+    "index.py": {"output": "index.html", "name": "index"},
+    "parser.py": {"output": "parser.html", "name": "parser"},
+    "cleaner.py": {"output": "cleaner.html", "name": "cleaner"},
+    "merger.py": {"output": "merger.html", "name": "merger"},
+    "extractor.py": {"output": "extractor.html", "name": "extractor"},
+    "models.py": {"output": "models.html", "name": "models"},
 }
 
 
@@ -44,27 +44,23 @@ def main():
     # Export each notebook
     for notebook_file, config in NOTEBOOKS.items():
         notebook_path = NOTEBOOKS_DIR / notebook_file
-        output_path = config["output"]
-        mode = config["mode"]
+        output_filename = config["output"]
+        output_path = OUTPUT_DIR / output_filename
         name = config["name"]
 
-        print(f"📓 Exporting {name} (mode={mode})...")
+        print(f"📓 Exporting {name} to static HTML...")
 
-        # Create output directory
-        output_path.mkdir(parents=True, exist_ok=True)
-
-        # Export command (code hidden by default - users can toggle visibility)
+        # Export command - static HTML with pre-rendered outputs, code hidden
         cmd = [
             "uv",
             "run",
             "marimo",
             "export",
-            "html-wasm",
+            "html",
             str(notebook_path),
             "-o",
             str(output_path),
-            "--mode",
-            mode,
+            "--no-include-code",
         ]
 
         try:
@@ -89,13 +85,13 @@ This site contains interactive documentation for the markdown-table-extractor li
 ## Pages
 
 - [Home](./index.html) - Main documentation hub
-- [Parser](./parser/index.html) - Table parsing functions
-- [Cleaner](./cleaner/index.html) - Data cleaning utilities
-- [Merger](./merger/index.html) - Table merging logic
-- [Extractor](./extractor/index.html) - Main extraction API
-- [Models](./models/index.html) - Data models and types
+- [Parser](./parser.html) - Table parsing functions
+- [Cleaner](./cleaner.html) - Data cleaning utilities
+- [Merger](./merger.html) - Table merging logic
+- [Extractor](./extractor.html) - Main extraction API
+- [Models](./models.html) - Data models and types
 
-All documentation is powered by [marimo](https://marimo.io) and runs entirely in your browser using WebAssembly!
+All documentation is powered by [marimo](https://marimo.io) with pre-rendered static HTML!
 """)
     print(f"✓ Created {readme}")
 

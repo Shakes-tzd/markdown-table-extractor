@@ -38,45 +38,45 @@ jobs:
 
       - name: Export index (main documentation)
         run: |
-          uv run marimo export html-wasm \
+          uv run marimo export html \
             src/markdown_table_extractor/core/index.py \
-            -o _site \
-            --mode run
+            -o _site/index.html \
+            --no-include-code
 
       - name: Export parser notebook
         run: |
-          uv run marimo export html-wasm \
+          uv run marimo export html \
             src/markdown_table_extractor/core/parser.py \
-            -o _site/parser \
-            --mode run
+            -o _site/parser.html \
+            --no-include-code
 
       - name: Export cleaner notebook
         run: |
-          uv run marimo export html-wasm \
+          uv run marimo export html \
             src/markdown_table_extractor/core/cleaner.py \
-            -o _site/cleaner \
-            --mode run
+            -o _site/cleaner.html \
+            --no-include-code
 
       - name: Export merger notebook
         run: |
-          uv run marimo export html-wasm \
+          uv run marimo export html \
             src/markdown_table_extractor/core/merger.py \
-            -o _site/merger \
-            --mode run
+            -o _site/merger.html \
+            --no-include-code
 
       - name: Export extractor notebook
         run: |
-          uv run marimo export html-wasm \
+          uv run marimo export html \
             src/markdown_table_extractor/core/extractor.py \
-            -o _site/extractor \
-            --mode run
+            -o _site/extractor.html \
+            --no-include-code
 
       - name: Export models notebook
         run: |
-          uv run marimo export html-wasm \
+          uv run marimo export html \
             src/markdown_table_extractor/core/models.py \
-            -o _site/models \
-            --mode run
+            -o _site/models.html \
+            --no-include-code
 
       - name: Create .nojekyll
         run: touch _site/.nojekyll
