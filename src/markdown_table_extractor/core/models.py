@@ -144,21 +144,47 @@ def _(mo):
 
 
 @app.cell
-def _(pd, ExtractedTable):
-    # Live demo
-    df = pd.DataFrame({"Name": ["Alice", "Bob"], "Score": [95, 87]})
-    table = ExtractedTable(
-        dataframe=df,
+def _(mo, pd, ExtractedTable):
+    # Live demo - create an ExtractedTable instance
+    _demo_df = pd.DataFrame({"Name": ["Alice", "Bob"], "Score": [95, 87]})
+    _demo_table = ExtractedTable(
+        dataframe=_demo_df,
         caption="Table 1. Test Scores",
+        start_line=5,
+        end_line=7,
+        raw_markdown="| Name | Score |\n|------|-------|\n| Alice | 95 |\n| Bob | 87 |",
+        is_continuation=False,
     )
-    table
-    return (df, table)
 
-
-@app.cell
-def _(table):
-    # Show properties
-    f"Columns: {table.column_count}, Rows: {table.row_count}"
+    mo.vstack([
+        mo.md("## 📋 ExtractedTable Example"),
+        mo.md("**Creating an ExtractedTable instance:**"),
+        mo.md("""
+        ```python
+        table = ExtractedTable(
+            dataframe=df,
+            caption="Table 1. Test Scores",
+            start_line=5,
+            end_line=7,
+            is_continuation=False
+        )
+        ```
+        """),
+        mo.md("**Table Data:**"),
+        mo.ui.table(_demo_table.dataframe, selection=None),
+        mo.md("**Table Properties:**"),
+        mo.accordion({
+            "Metadata": mo.md(f"""
+            - **Caption:** `{_demo_table.caption}`
+            - **Rows:** {_demo_table.row_count}
+            - **Columns:** {_demo_table.column_count}
+            - **Start Line:** {_demo_table.start_line}
+            - **End Line:** {_demo_table.end_line}
+            - **Is Continuation:** {_demo_table.is_continuation}
+            """),
+            "Raw Markdown": mo.md(f"```markdown\n{_demo_table.raw_markdown}\n```"),
+        }),
+    ])
     return
 
 

@@ -146,6 +146,7 @@ app = marimo.App(width="medium")
 @app.cell
 def _():
     import marimo as mo
+    import pandas as pd
     from markdown_table_extractor.core.cleaner import (
         clean_column_name,
         clean_value,
@@ -153,7 +154,7 @@ def _():
         normalize_headers,
         merge_sub_header,
     )
-    return (mo, clean_column_name, clean_value, headers_match, normalize_headers, merge_sub_header)
+    return (mo, pd, clean_column_name, clean_value, headers_match, normalize_headers, merge_sub_header)
 
 
 @app.cell
@@ -182,7 +183,7 @@ def _(mo):
 
 
 @app.cell
-def _(mo, clean_column_name, clean_value):
+def _(mo, clean_column_name, clean_value, pd):
     # Test HTML cleaning with before/after visualization
     _dirty_examples = [
         ("Column<br>Name", "Column header with line break"),
@@ -195,24 +196,21 @@ def _(mo, clean_column_name, clean_value):
     for dirty_text, description in _dirty_examples:
         _cleaned = clean_column_name(dirty_text)
         _results.append({
-            "Input": dirty_text,
-            "Output": _cleaned,
-            "Description": description
+            "Description": description,
+            "Before": dirty_text,
+            "After": _cleaned,
+            "Cleaned": "✅" if dirty_text != _cleaned else "—"
         })
+
+    _clean_df = pd.DataFrame(_results)
 
     mo.vstack([
         mo.md("### Before & After Cleaning"),
-        mo.accordion({
-            example["Description"]: mo.vstack([
-                mo.md(f"**Input (with HTML):** `{example['Input']}`"),
-                mo.md(f"**Output (cleaned):** `{example['Output']}`"),
-                mo.callout(
-                    f"Removed: {set(example['Input']) - set(example['Output']) if example['Input'] != example['Output'] else 'nothing'}",
-                    kind="neutral"
-                ) if example['Input'] != example['Output'] else mo.md("")
-            ])
-            for example in _results
-        }, multiple=True)
+        mo.ui.table(_clean_df, selection=None),
+        mo.callout(
+            f"Cleaned {len([r for r in _results if r['Cleaned'] == '✅'])} out of {len(_results)} examples",
+            kind="success"
+        )
     ])
     return
 
@@ -224,30 +222,37 @@ def _(mo):
 
 
 @app.cell
-def _(mo, headers_match):
+def _(mo, headers_match, pd):
     # Test header matching with visual comparison
     _header_tests = [
-        (["Name", "Age", "City"], ["name", "age", "city"], "Same headers, different case"),
-        (["Name", "Age", "City"], ["Name", "Age", "Location"], "One column different"),
-        (["ID", "Patient Name", "Score"], ["ID", "Patient Name", "Score"], "Exact match"),
-        (["Column A", "Column B"], ["Column A", "Column C"], "50% match"),
+        (["Name", "Age", "City"], ["name", "age", "city"], "Case-insensitive", True),
+        (["Name", "Age", "City"], ["Name", "Age", "Location"], "One different", False),
+        (["ID", "Patient Name", "Score"], ["ID", "Patient Name", "Score"], "Exact match", True),
+        (["Column A", "Column B"], ["Column A", "Column C"], "50% match", False),
     ]
 
-    _comparison_results = []
-    for h1, h2, desc in _header_tests:
+    _comparison_data = []
+    for h1, h2, desc, expected in _header_tests:
         _match = headers_match(h1, h2)
         _emoji = "✅" if _match else "❌"
-        _comparison_results.append(mo.vstack([
-            mo.md(f"### {desc}"),
-            mo.md(f"**Headers 1:** `{h1}`"),
-            mo.md(f"**Headers 2:** `{h2}`"),
-            mo.callout(
-                f"{_emoji} Match result: **{_match}**",
-                kind="success" if _match else "warn"
-            ),
-        ]))
+        _comparison_data.append({
+            "Test": desc,
+            "Headers 1": str(h1),
+            "Headers 2": str(h2),
+            "Match": _emoji + (" Yes" if _match else " No"),
+            "Expected": "✅" if _match == expected else "⚠️"
+        })
 
-    mo.vstack(_comparison_results)
+    _match_df = pd.DataFrame(_comparison_data)
+
+    mo.vstack([
+        mo.md("### Header Comparison Results"),
+        mo.ui.table(_match_df, selection=None),
+        mo.callout(
+            "Headers are matched using normalized comparison (case-insensitive, cleaned)",
+            kind="info"
+        )
+    ])
     return
 
 

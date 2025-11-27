@@ -332,7 +332,48 @@ def _(mo, module_card):
 
 
 @app.cell
-def _(code_block, mo):
+def _(code_block, extract_markdown_tables, extract_tables, mo):
+    # Academic Paper Table Example
+    _academic_table = """
+**Table 1. Patient Demographics**
+
+| Variable | Group A<br>n=50 | Group B<br>n=45 |
+|----------|-----------------|-----------------|
+| Age (years) | 45.2 ± 3.1 | 47.8 ± 2.9 |
+| Male/Female | 28/22 | 25/20 |
+"""
+
+    _academic_result = extract_markdown_tables(_academic_table)
+
+    # Multi-page Table Example
+    _continued_tables = """
+Table 2. Results Summary
+
+| ID | Name  | Score |
+|----|-------|-------|
+| 1  | Alice | 95    |
+| 2  | Bob   | 87    |
+
+Table 2 (Continued)
+
+| ID | Name  | Score |
+|----|-------|-------|
+| 3  | Carol | 92    |
+| 4  | Dave  | 88    |
+"""
+
+    _continued_result = extract_markdown_tables(_continued_tables)
+
+    # Complex Alignment Example
+    _aligned_table = """
+| Left | Center | Right |
+|:-----|:------:|------:|
+| L1   | C1     | R1    |
+| L2   | C2     | R2    |
+"""
+
+    _aligned_result = extract_tables(_aligned_table)
+
     # Examples content
     examples_content = mo.vstack([
         mo.md("# 💡 Live Examples"),
@@ -343,57 +384,38 @@ def _(code_block, mo):
                 Academic papers often have complex tables with multi-level headers,
                 HTML tags, and specific caption patterns.
                 """),
-                code_block('''from markdown_table_extractor import extract_markdown_tables
-
-    academic_table = """
-    **Table 1. Patient Demographics**
-
-    | Variable | Group A<br>n=50 | Group B<br>n=45 |
-    |----------|-----------------|-----------------|
-    | Age (years) | 45.2 ± 3.1 | 47.8 ± 2.9 |
-    | Male/Female | 28/22 | 25/20 |
-    """
-
-    result = extract_markdown_tables(academic_table)
-    print(result[0].caption)  # "**Table 1. Patient Demographics**"
-    print(result[0].dataframe)'''),
+                mo.md("**Input markdown:**"),
+                mo.md(f"```markdown\n{_academic_table}\n```"),
+                mo.md("**Extracted table:**"),
+                mo.ui.table(_academic_result[0].dataframe, selection=None),
+                mo.callout(
+                    f"Caption: {_academic_result[0].caption} | HTML tags automatically cleaned!",
+                    kind="success"
+                ),
             ]),
 
             "📑 Multi-page Tables": mo.vstack([
                 mo.md("Tables spanning multiple pages with continuation markers:"),
-                code_block('''continued_tables = """
-    Table 2. Results Summary
-
-    | ID | Name  | Score |
-    |----|-------|-------|
-    | 1  | Alice | 95    |
-    | 2  | Bob   | 87    |
-
-    Table 2 (Continued)
-
-    | ID | Name  | Score |
-    |----|-------|-------|
-    | 3  | Carol | 92    |
-    | 4  | Dave  | 88    |
-    """
-
-    result = extract_markdown_tables(continued_tables)
-    print(f"Tables: {len(result)}")  # 1 (auto-merged!)
-    print(f"Rows: {result[0].row_count}")  # 4
-    print(f"Merged: {result.merged_count}")  # 1'''),
+                mo.md("**Input markdown:**"),
+                mo.md(f"```markdown\n{_continued_tables}\n```"),
+                mo.md("**Merged result:**"),
+                mo.ui.table(_continued_result[0].dataframe, selection=None),
+                mo.callout(
+                    f"Merged {_continued_result.merged_count} continuation table(s) → {_continued_result[0].row_count} total rows",
+                    kind="success"
+                ),
             ]),
 
             "⬅️➡️ Complex Alignment": mo.vstack([
-                mo.md("Tables with different alignment markers:"),
-                code_block('''aligned_table = """
-    | Left | Center | Right |
-    |:-----|:------:|------:|
-    | L1   | C1     | R1    |
-    | L2   | C2     | R2    |
-    """
-
-    tables = extract_tables(aligned_table)
-    print(tables[0])'''),
+                mo.md("Tables with different alignment markers (left, center, right):"),
+                mo.md("**Input markdown:**"),
+                mo.md(f"```markdown\n{_aligned_table}\n```"),
+                mo.md("**Extracted table:**"),
+                mo.ui.table(_aligned_result[0], selection=None),
+                mo.callout(
+                    "Alignment markers (:---, :---:, ---:) are correctly detected and parsed!",
+                    kind="success"
+                ),
             ]),
 
             "💾 Export Formats": mo.vstack([

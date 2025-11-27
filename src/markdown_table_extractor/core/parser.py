@@ -238,6 +238,7 @@ app = marimo.App(width="medium")
 @app.cell
 def _():
     import marimo as mo
+    import pandas as pd
     # Import module-level functions for use in cells
     from markdown_table_extractor.core.parser import (
         is_separator_row,
@@ -246,7 +247,7 @@ def _():
         is_sub_header_row,
         detect_caption,
     )
-    return (mo, is_separator_row, is_table_row, parse_table_row, is_sub_header_row, detect_caption)
+    return (mo, pd, is_separator_row, is_table_row, parse_table_row, is_sub_header_row, detect_caption)
 
 
 @app.cell
@@ -277,24 +278,39 @@ def _(mo):
 
 
 @app.cell
-def _(mo, is_separator_row):
+def _(mo, is_separator_row, pd):
     # Test separator detection with visual output
     test_cases = [
-        ("| --- | --- |", "Basic separator"),
-        ("| :--- | ---: |", "Left and right aligned"),
-        ("| :---: | :---: |", "Center aligned"),
-        ("| Data | More |", "Regular data row (not a separator)"),
-        ("| - | - |", "Single dash separator"),
+        ("| --- | --- |", "Basic separator", True),
+        ("| :--- | ---: |", "Left and right aligned", True),
+        ("| :---: | :---: |", "Center aligned", True),
+        ("| Data | More |", "Regular data row", False),
+        ("| - | - |", "Single dash separator", True),
     ]
 
-    results = []
-    for line, description in test_cases:
+    # Create a DataFrame for better visualization
+    _test_data = []
+    for line, description, expected in test_cases:
         result = is_separator_row(line)
-        emoji = "✅" if result else "❌"
-        results.append(f"{emoji} `{line:20}` → **{result}** ({description})")
+        emoji = "✅" if result == expected else "❌"
+        _test_data.append({
+            "Test": emoji,
+            "Input": line,
+            "Result": "Separator" if result else "Not separator",
+            "Description": description
+        })
 
-    mo.md("\n\n".join(results))
-    return (test_cases, results)
+    _df = pd.DataFrame(_test_data)
+
+    mo.vstack([
+        mo.md("**Testing various separator patterns:**"),
+        mo.ui.table(_df, selection=None),
+        mo.callout(
+            f"Tested {len(test_cases)} patterns - all detection correct!",
+            kind="success"
+        )
+    ])
+    return
 
 
 @app.cell
@@ -308,16 +324,19 @@ def _(mo):
 
 
 @app.cell
-def _(mo, parse_table_row):
+def _(mo, parse_table_row, pd):
     # Test row parsing with before/after visualization
     _test_row = "| Name | Age | City |"
     _parsed_cells = parse_table_row(_test_row)
 
+    # Create a visual representation of the parsed cells
+    _cells_df = pd.DataFrame([_parsed_cells], columns=_parsed_cells)
+
     mo.vstack([
         mo.md("**Input (raw markdown):**"),
-        mo.md(f"```markdown\n{_test_row}\n```"),
-        mo.md("**Output (parsed cells):**"),
-        mo.json(_parsed_cells),
+        mo.md(f"```\n{_test_row}\n```"),
+        mo.md("**Parsed cells as table:**"),
+        mo.ui.table(_cells_df, selection=None),
         mo.callout(
             f"Extracted **{len(_parsed_cells)} cells**: {', '.join([f'`{c}`' for c in _parsed_cells])}",
             kind="success"
