@@ -594,7 +594,7 @@ def _(mo):
 @app.cell
 def _(mo, home_content, quickstart_content, modules_content, examples_content, api_content):
     # Main application layout with tabs
-    documentation = mo.ui.tabs({
+    _tabs = mo.ui.tabs({
         f"{mo.icon('lucide:home')} Home": home_content,
         f"{mo.icon('lucide:zap')} Quick Start": quickstart_content,
         f"{mo.icon('lucide:package')} Modules": modules_content,
@@ -602,13 +602,16 @@ def _(mo, home_content, quickstart_content, modules_content, examples_content, a
         f"{mo.icon('lucide:book-open')} API": api_content,
     })
 
-    # Layout
-    mo.vstack([
+    # Create and display the final layout
+    _layout = mo.vstack([
         mo.md("# 📊 Markdown Table Extractor Documentation"),
         mo.Html("<hr style='margin: 1rem 0; border: none; border-top: 2px solid #e0e0e0;'>"),
-        documentation,
+        _tabs,
     ])
-    return (documentation,)
+
+    # Display the layout by having it as the last expression
+    _layout
+    return
 
 
 if __name__ == "__main__":
