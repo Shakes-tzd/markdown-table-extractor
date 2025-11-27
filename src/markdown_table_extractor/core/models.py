@@ -127,19 +127,38 @@ def _():
 
 @app.cell
 def _(mo):
-    mo.md(
-        """
-        # Data Models
+    mo.md("# Data Models")
+    return
 
-        This module defines the core data structures for table extraction.
 
-        ## Classes
+@app.cell
+def _(mo):
+    mo.md("""
+    ## `TableMergeStrategy` (Enum)
 
-        - **TableMergeStrategy**: Enum for merge behavior
-        - **ExtractedTable**: Single table with metadata  
-        - **ExtractionResult**: Collection of tables with errors
-        """
-    )
+    Controls how continuation tables are merged.
+    """)
+    return
+
+
+@app.cell
+def _(mo, TableMergeStrategy):
+    mo.vstack([
+        mo.md("**Available strategies:**"),
+        mo.md(f"- `NONE` = `{TableMergeStrategy.NONE.value}` - Don't merge any tables"),
+        mo.md(f"- `IDENTICAL_HEADERS` = `{TableMergeStrategy.IDENTICAL_HEADERS.value}` - Merge if headers match"),
+        mo.md(f"- `COMPATIBLE_COLUMNS` = `{TableMergeStrategy.COMPATIBLE_COLUMNS.value}` - Merge if columns within ±2"),
+    ])
+    return
+
+
+@app.cell
+def _(mo):
+    mo.md("""
+    ## `ExtractedTable` (dataclass)
+
+    Represents a single extracted table with metadata.
+    """)
     return
 
 

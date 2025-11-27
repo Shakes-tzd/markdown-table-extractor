@@ -256,13 +256,6 @@ def _(mo):
     # Markdown Table Parser
 
     Functions for detecting and parsing markdown table structures.
-
-    ## Key Functions
-
-    - `is_table_row(line)` - Check if line is a table row
-    - `is_separator_row(line)` - Check if line is separator (---)
-    - `parse_table_row(line)` - Extract cell contents
-    - `detect_caption(lines, start)` - Find table caption
     """)
     return
 
@@ -270,9 +263,134 @@ def _(mo):
 @app.cell
 def _(mo):
     mo.md("""
-    ## 🔍 Separator Detection Demo
+    ## `is_table_row(line: str) -> bool`
 
-    Test how the parser identifies table separator rows with different alignment markers.
+    Check if a line is a table data row. A table row starts and ends with `|`.
+    """)
+    return
+
+
+@app.cell
+def _(mo, is_table_row):
+    # Example 1: Valid table row
+    _ex1 = "| Cell 1 | Cell 2 |"
+    _result1 = is_table_row(_ex1)
+
+    # Example 2: Not a table row
+    _ex2 = "Just plain text"
+    _result2 = is_table_row(_ex2)
+
+    mo.vstack([
+        mo.md(f"**Example 1:** `{_ex1}` → `{_result1}`"),
+        mo.md(f"**Example 2:** `{_ex2}` → `{_result2}`"),
+        mo.callout(
+            f"is_table_row() correctly identifies table rows by checking for | at start and end",
+            kind="success" if _result1 and not _result2 else "warn"
+        )
+    ])
+    return
+
+
+@app.cell
+def _(mo):
+    mo.md("""
+    ## `is_separator_row(line: str) -> bool`
+
+    Detects separator rows like `| --- |` with various alignment markers.
+    """)
+    return
+
+
+@app.cell
+def _(mo, is_separator_row):
+    # Examples with different alignment patterns
+    _sep_examples = [
+        ("| --- | --- |", True, "Basic"),
+        ("| :--- | ---: |", True, "Left/Right aligned"),
+        ("| :---: | :---: |", True, "Center aligned"),
+        ("| Data | More |", False, "Data row"),
+    ]
+
+    _results = []
+    for line, expected, desc in _sep_examples:
+        result = is_separator_row(line)
+        _results.append(f"{'✅' if result == expected else '❌'} `{line}` → `{result}` ({desc})")
+
+    mo.md("\n\n".join(_results))
+    return
+
+
+@app.cell
+def _(mo):
+    mo.md("""
+    ## `parse_table_row(line: str) -> list[str]`
+
+    Extract cell values from a table row.
+    """)
+    return
+
+
+@app.cell
+def _(mo, parse_table_row, pd):
+    # Example: Parse a table row
+    _row = "| Name | Age | City |"
+    _cells = parse_table_row(_row)
+
+    # Show as DataFrame
+    _cells_df = pd.DataFrame([_cells], columns=_cells)
+
+    mo.vstack([
+        mo.md(f"**Input:** `{_row}`"),
+        mo.md(f"**Parsed cells:** `{_cells}`"),
+        mo.ui.table(_cells_df, selection=None),
+    ])
+    return
+
+
+@app.cell
+def _(mo):
+    mo.md("""
+    ## `detect_caption(lines, table_start_line) -> tuple`
+
+    Find table captions like "Table 3. Results" or "Table 1 (Continued)".
+    """)
+    return
+
+
+@app.cell
+def _(mo, detect_caption):
+    # Example document with caption
+    _doc = [
+        "# Research Results",
+        "",
+        "Table 3. Patient Demographics",
+        "",
+        "| Name | Age |",
+        "| --- | --- |",
+    ]
+
+    _caption, _is_cont, _table_num, _is_bare = detect_caption(_doc, 4)
+
+    mo.vstack([
+        mo.md("**Document:**"),
+        mo.md(f"```markdown\n{chr(10).join(_doc)}\n```"),
+        mo.md("**Detected:**"),
+        mo.md(f"- Caption: `{_caption}`"),
+        mo.md(f"- Table Number: `{_table_num}`"),
+        mo.md(f"- Is Continuation: `{_is_cont}`"),
+        mo.md(f"- Is Bare: `{_is_bare}`"),
+    ])
+    return
+
+
+@app.cell
+def _(mo):
+    mo.md("""
+    ---
+
+    ## 🔍 Comprehensive Demos
+
+    Below are comprehensive tests showing all functions working together.
     """)
     return
 

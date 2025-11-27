@@ -159,26 +159,95 @@ def _():
 
 @app.cell
 def _(mo):
-    mo.md(
-        """
-        # Data Cleaning Utilities
-
-        Functions for normalizing column names and cell values.
-
-        ## Key Functions
-
-        - `clean_column_name(name)` - Clean a single header
-        - `clean_value(value)` - Clean a cell value
-        - `headers_match(h1, h2)` - Check if headers are similar
-        - `normalize_headers(headers)` - Normalize for comparison
-        """
-    )
+    mo.md("# Data Cleaning Utilities")
     return
 
 
 @app.cell
 def _(mo):
-    mo.md("## 🧹 HTML Cleaning Demo")
+    mo.md("""
+    ## `clean_column_name(name: str) -> str`
+
+    Remove HTML tags and normalize whitespace in column names.
+    """)
+    return
+
+
+@app.cell
+def _(mo, clean_column_name):
+    # Examples showing HTML cleaning
+    _examples = [
+        "Column<br>Name",
+        "Patient&nbsp;ID",
+        "Age<br>(years)",
+    ]
+
+    _cleaned = [clean_column_name(ex) for ex in _examples]
+
+    mo.vstack([
+        mo.md("**Before → After:**"),
+        *[mo.md(f"- `{before}` → `{after}`") for before, after in zip(_examples, _cleaned)],
+        mo.callout(f"Cleaned {len(_examples)} column names", kind="success")
+    ])
+    return
+
+
+@app.cell
+def _(mo):
+    mo.md("""
+    ## `clean_value(value: str) -> str`
+
+    Clean cell values by removing HTML and normalizing whitespace.
+    """)
+    return
+
+
+@app.cell
+def _(mo, clean_value):
+    _value = "Data<br>with&nbsp;HTML"
+    _cleaned_val = clean_value(_value)
+
+    mo.vstack([
+        mo.md(f"**Input:** `{_value}`"),
+        mo.md(f"**Output:** `{_cleaned_val}`"),
+    ])
+    return
+
+
+@app.cell
+def _(mo):
+    mo.md("""
+    ## `headers_match(h1, h2, threshold=0.8) -> bool`
+
+    Check if two header lists are similar enough to merge.
+    """)
+    return
+
+
+@app.cell
+def _(mo, headers_match):
+    # Test cases
+    _h1 = ["Name", "Age", "City"]
+    _h2_same = ["name", "age", "city"]  # Case different
+    _h3_diff = ["Name", "Age", "Location"]  # One column different
+
+    _match1 = headers_match(_h1, _h2_same)
+    _match2 = headers_match(_h1, _h3_diff)
+
+    mo.vstack([
+        mo.md(f"`{_h1}` vs `{_h2_same}` → **{_match1}** (case-insensitive match)"),
+        mo.md(f"`{_h1}` vs `{_h3_diff}` → **{_match2}** (one column different)"),
+    ])
+    return
+
+
+@app.cell
+def _(mo):
+    mo.md("""
+    ---
+
+    ## 🧹 Comprehensive Cleaning Demo
+    """)
     return
 
 

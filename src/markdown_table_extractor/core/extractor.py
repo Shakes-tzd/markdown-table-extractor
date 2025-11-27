@@ -257,36 +257,78 @@ def _():
 
 @app.cell
 def _(mo):
-    mo.md(
-        """
-        # Table Extractor
-
-        Main entry point for extracting tables from markdown.
-
-        ## API
-
-        **Simple (returns DataFrames):**
-        ```python
-        tables = extract_tables(text)
-        ```
-
-        **Full (returns ExtractionResult with metadata):**
-        ```python
-        result = extract_markdown_tables(text)
-        for table in result:
-            print(table.caption, table.dataframe)
-        ```
-        """
-    )
+    mo.md("# Table Extractor")
     return
 
 
 @app.cell
 def _(mo):
     mo.md("""
-    ## 🎯 End-to-End Extraction Demo
+    ## `extract_tables(text: str) -> list[pd.DataFrame]`
 
-    See the complete extraction pipeline in action!
+    **Simple API** - Returns just DataFrames.
+    """)
+    return
+
+
+@app.cell
+def _(mo, extract_tables):
+    _simple_md = """
+| Name | Score |
+|------|-------|
+| Alice | 95 |
+| Bob | 87 |
+"""
+
+    _tables = extract_tables(_simple_md)
+
+    mo.vstack([
+        mo.md("**Input markdown:**"),
+        mo.md(_simple_md),
+        mo.md("**Extracted DataFrame:**"),
+        mo.ui.table(_tables[0], selection=None),
+        mo.callout(f"Extracted {len(_tables)} table(s)", kind="success"),
+    ])
+    return
+
+
+@app.cell
+def _(mo):
+    mo.md("""
+    ## `extract_markdown_tables(text, ...) -> ExtractionResult`
+
+    **Full API** - Returns tables with metadata (captions, line numbers, etc.).
+    """)
+    return
+
+
+@app.cell
+def _(mo, extract_markdown_tables):
+    _full_md = """
+Table 1. Test Results
+
+| Name | Score |
+|------|-------|
+| Alice | 95 |
+"""
+
+    _result = extract_markdown_tables(_full_md)
+
+    mo.vstack([
+        mo.md("**Extracted with metadata:**"),
+        mo.md(f"- Caption: `{_result[0].caption}`"),
+        mo.md(f"- Rows: {_result[0].row_count}, Columns: {_result[0].column_count}"),
+        mo.ui.table(_result[0].dataframe, selection=None),
+    ])
+    return
+
+
+@app.cell
+def _(mo):
+    mo.md("""
+    ---
+
+    ## 🎯 End-to-End Demo with Continuation Tables
     """)
     return
 

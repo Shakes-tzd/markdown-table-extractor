@@ -303,19 +303,88 @@ def _():
 
 @app.cell
 def _(mo):
-    mo.md(
-        """
-        # Table Merger
+    mo.md("# Table Merger")
+    return
 
-        Handles merging continuation tables (e.g., "Table 3 (Continued)").
 
-        ## Key Functions
+@app.cell
+def _(mo):
+    mo.md("""
+    ## `is_continuation_table(table: ExtractedTable) -> bool`
 
-        - `is_continuation_table(table)` - Check for continuation marker
-        - `should_merge_tables(t1, t2, strategy)` - Check if mergeable
-        - `merge_tables(tables, strategy)` - Merge all continuations
-        """
+    Check if a table has a continuation marker like "(Continued)" or "(Cont.)".
+    """)
+    return
+
+
+@app.cell
+def _(mo, pd, ExtractedTable, is_continuation_table):
+    # Example 1: Table with continuation marker
+    _cont_table = ExtractedTable(
+        dataframe=pd.DataFrame({"Name": ["Carol"], "Score": [92]}),
+        caption="Table 1 (Continued)",
+        is_continuation=True
     )
+
+    # Example 2: Regular table
+    _regular_table = ExtractedTable(
+        dataframe=pd.DataFrame({"Name": ["Alice"], "Score": [95]}),
+        caption="Table 2. Results"
+    )
+
+    _is_cont1 = is_continuation_table(_cont_table)
+    _is_cont2 = is_continuation_table(_regular_table)
+
+    mo.vstack([
+        mo.md(f"**Table 1:** `{_cont_table.caption}` → `{_is_cont1}`"),
+        mo.md(f"**Table 2:** `{_regular_table.caption}` → `{_is_cont2}`"),
+    ])
+    return
+
+
+@app.cell
+def _(mo):
+    mo.md("""
+    ## `merge_two_tables(table1, table2) -> ExtractedTable`
+
+    Combine two tables into one, preserving the first table's caption.
+    """)
+    return
+
+
+@app.cell
+def _(mo, pd, ExtractedTable, merge_two_tables):
+    # Create two tables to merge
+    _t1 = ExtractedTable(
+        dataframe=pd.DataFrame({"ID": [1, 2], "Name": ["Alice", "Bob"]}),
+        caption="Table 1. Data"
+    )
+    _t2 = ExtractedTable(
+        dataframe=pd.DataFrame({"ID": [3, 4], "Name": ["Carol", "Dave"]}),
+        caption="Table 1 (Continued)",
+        is_continuation=True
+    )
+
+    _merged = merge_two_tables(_t1, _t2)
+
+    mo.vstack([
+        mo.md("**Before merging:**"),
+        mo.md(f"- Table 1: {_t1.row_count} rows"),
+        mo.md(f"- Table 2: {_t2.row_count} rows"),
+        mo.md("**After merging:**"),
+        mo.ui.table(_merged.dataframe, selection=None),
+        mo.callout(f"Merged into {_merged.row_count} total rows", kind="success"),
+    ])
+    return
+
+
+@app.cell
+def _(mo):
+    mo.md("""
+    ---
+
+    ## 🔗 Comprehensive Merge Demo
+    """)
     return
 
 
