@@ -144,31 +144,44 @@ def _(code_block, extract_tables, mo):
 
         mo.md("## Basic Usage"),
 
-        mo.md("### Import and define a markdown table:"),
+        mo.md("### Step 1: Import the library"),
         code_block('''import marimo as mo
 import pandas as pd
-from markdown_table_extractor import extract_tables, extract_markdown_tables
+from markdown_table_extractor import extract_tables, extract_markdown_tables'''),
 
-markdown_text = """
+        mo.md("### Step 2: Define a markdown document"),
+        code_block('''markdown_text = """
+# Employee Directory
+
+Below is our current employee roster with location information:
+
 | Name  | Age | City     |
 |-------|-----|----------|
 | Alice | 30  | New York |
 | Bob   | 25  | London   |
+
+Updated as of Q4 2025.
 """'''),
 
-        mo.md("### Here's the markdown table:"),
+        mo.md("### Step 3: See what the document looks like (rendered):"),
         mo.md("""
+# Employee Directory
+
+Below is our current employee roster with location information:
+
 | Name  | Age | City     |
 |-------|-----|----------|
 | Alice | 30  | New York |
 | Bob   | 25  | London   |
+
+Updated as of Q4 2025.
 """),
 
-        mo.md("### Extract it with the Simple API:"),
+        mo.md("### Step 4: Extract the table with one line of code:"),
         code_block('''tables = extract_tables(markdown_text)
 tables[0]  # Returns a pandas DataFrame'''),
 
-        mo.md("**Result:**"),
+        mo.md("### Result - Clean DataFrame:"),
         mo.ui.table(
             extract_tables("""
 | Name  | Age | City     |
@@ -177,6 +190,10 @@ tables[0]  # Returns a pandas DataFrame'''),
 | Bob   | 25  | London   |
 """)[0],
             selection=None,
+        ),
+        mo.callout(
+            "✅ Table isolated and extracted as a clean pandas DataFrame - ready for analysis!",
+            kind="success"
         ),
 
         mo.md("## More Examples"),
@@ -337,18 +354,33 @@ def _(mo, module_card):
 def _(code_block, extract_markdown_tables, extract_tables, mo):
     # Academic Paper Table Example
     _academic_table = """
+# Clinical Trial Results
+
+This study examined the efficacy of a new treatment protocol across two patient groups.
+Baseline demographic characteristics were collected for all participants to ensure
+comparable populations.
+
 **Table 1. Patient Demographics**
 
 | Variable | Group A<br>n=50 | Group B<br>n=45 |
 |----------|-----------------|-----------------|
 | Age (years) | 45.2 ± 3.1 | 47.8 ± 2.9 |
 | Male/Female | 28/22 | 25/20 |
+
+The groups showed no significant differences in baseline characteristics (p > 0.05).
+Statistical analysis was performed using two-tailed t-tests with α = 0.05.
 """
 
     _academic_result = extract_markdown_tables(_academic_table)
 
     # Multi-page Table Example
     _continued_tables = """
+# Longitudinal Study Results
+
+We conducted a 6-month study tracking participant outcomes across multiple time points.
+The following table presents the complete dataset, which spans multiple pages in the
+original manuscript.
+
 Table 2. Results Summary
 
 | ID | Name  | Score |
@@ -356,22 +388,33 @@ Table 2. Results Summary
 | 1  | Alice | 95    |
 | 2  | Bob   | 87    |
 
+The table continues on the next page with additional participants.
+
 Table 2 (Continued)
 
 | ID | Name  | Score |
 |----|-------|-------|
 | 3  | Carol | 92    |
 | 4  | Dave  | 88    |
+
+All participants completed the study protocol without adverse events.
 """
 
     _continued_result = extract_markdown_tables(_continued_tables)
 
     # Complex Alignment Example
     _aligned_table = """
+# Data Formatting Guide
+
+Tables can use different alignment markers for left, center, and right alignment.
+This example demonstrates all three:
+
 | Left | Center | Right |
 |:-----|:------:|------:|
 | L1   | C1     | R1    |
 | L2   | C2     | R2    |
+
+Alignment markers (`:---`, `:---:`, `---:`) are detected and handled correctly.
 """
 
     _aligned_result = extract_tables(_aligned_table)
@@ -383,39 +426,48 @@ Table 2 (Continued)
         mo.accordion({
             "📄 Academic Paper Tables": mo.vstack([
                 mo.md("""
-                Academic papers often have complex tables with multi-level headers,
-                HTML tags, and specific caption patterns.
+                **Scenario:** Extracting a patient demographics table from a clinical trial manuscript
+                that contains HTML artifacts from PDF conversion.
                 """),
-                mo.md("**Input markdown:**"),
-                mo.md(f"```markdown\n{_academic_table}\n```"),
-                mo.md("**Extracted table:**"),
+                mo.md("### Input Document (rendered):"),
+                mo.md(_academic_table),
+                mo.md("---"),
+                mo.md("### Extracted Table:"),
                 mo.ui.table(_academic_result[0].dataframe, selection=None),
                 mo.callout(
-                    f"Caption: {_academic_result[0].caption} | HTML tags automatically cleaned!",
+                    f"✅ Caption detected: {_academic_result[0].caption} | HTML tags cleaned automatically!",
                     kind="success"
                 ),
             ]),
 
             "📑 Multi-page Tables": mo.vstack([
-                mo.md("Tables spanning multiple pages with continuation markers:"),
-                mo.md("**Input markdown:**"),
-                mo.md(f"```markdown\n{_continued_tables}\n```"),
-                mo.md("**Merged result:**"),
+                mo.md("""
+                **Scenario:** Extracting a dataset that spans multiple pages in a manuscript,
+                with a continuation marker on the second page.
+                """),
+                mo.md("### Input Document (rendered):"),
+                mo.md(_continued_tables),
+                mo.md("---"),
+                mo.md("### Merged Result:"),
                 mo.ui.table(_continued_result[0].dataframe, selection=None),
                 mo.callout(
-                    f"Merged {_continued_result.merged_count} continuation table(s) → {_continued_result[0].row_count} total rows",
+                    f"✅ Auto-merged {_continued_result.merged_count} continuation table → {_continued_result[0].row_count} total rows",
                     kind="success"
                 ),
             ]),
 
             "⬅️➡️ Complex Alignment": mo.vstack([
-                mo.md("Tables with different alignment markers (left, center, right):"),
-                mo.md("**Input markdown:**"),
-                mo.md(f"```markdown\n{_aligned_table}\n```"),
-                mo.md("**Extracted table:**"),
+                mo.md("""
+                **Scenario:** Parsing a table with mixed alignment markers (left, center, right)
+                from a formatting guide.
+                """),
+                mo.md("### Input Document (rendered):"),
+                mo.md(_aligned_table),
+                mo.md("---"),
+                mo.md("### Extracted Table:"),
                 mo.ui.table(_aligned_result[0], selection=None),
                 mo.callout(
-                    "Alignment markers (:---, :---:, ---:) are correctly detected and parsed!",
+                    "✅ Alignment markers (:---, :---:, ---:) correctly detected!",
                     kind="success"
                 ),
             ]),
