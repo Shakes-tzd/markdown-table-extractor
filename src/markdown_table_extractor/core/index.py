@@ -1,13 +1,3 @@
-"""Documentation entry point for markdown-table-extractor.
-
-This interactive notebook serves as the main documentation hub with live examples
-and navigation to all module notebooks.
-
-Run with:
-    uv run marimo edit src/markdown_table_extractor/core/index.py
-"""
-from __future__ import annotations
-
 import marimo
 
 __generated_with = "0.18.1"
@@ -17,7 +7,9 @@ app = marimo.App(width="full")
 @app.cell
 def _():
     import marimo as mo
-    return (mo,)
+    import pandas as pd
+    from markdown_table_extractor import extract_tables, extract_markdown_tables
+    return extract_markdown_tables, extract_tables, mo, pd
 
 
 @app.cell
@@ -42,12 +34,11 @@ def _(mo):
         {command}
         ```
         """)
-
-    return (code_block, module_card)
+    return code_block, module_card
 
 
 @app.cell
-def _(mo):
+def _(code_block, mo):
     # Home page content
     home_content = mo.vstack([
         mo.md("""
@@ -116,12 +107,27 @@ def _(mo):
             "poetry": code_block("poetry add markdown-table-extractor", "bash"),
         }),
     ])
-
     return (home_content,)
 
 
 @app.cell
-def _(mo, code_block):
+def _(extract_tables, mo):
+    # Define example markdown text for demos
+    _example_markdown = """
+| Name  | Age | City     |
+|-------|-----|----------|
+| Alice | 30  | New York |
+| Bob   | 25  | London   |
+"""
+
+    # Simple API demo - extract the table
+    _simple_demo_table = extract_tables(_example_markdown)[0]
+
+    return
+
+
+@app.cell
+def _(code_block, extract_tables, mo):
     # Quick Start content
     quickstart_content = mo.vstack([
         mo.md("# ⚡ Quick Start"),
@@ -134,30 +140,46 @@ def _(mo, code_block):
         mo.md("## Installation"),
         code_block("pip install markdown-table-extractor", "bash"),
 
-        mo.md("## Usage"),
+        mo.md("## Basic Usage"),
 
-        mo.ui.tabs({
-            "Simple API": mo.vstack([
-                mo.md("Returns just DataFrames - perfect for quick extraction:"),
-                code_block('''from markdown_table_extractor import extract_tables
+        mo.md("### Import and define a markdown table:"),
+        code_block('''import marimo as mo
+import pandas as pd
+from markdown_table_extractor import extract_tables, extract_markdown_tables
 
 markdown_text = """
 | Name  | Age | City     |
 |-------|-----|----------|
 | Alice | 30  | New York |
 | Bob   | 25  | London   |
-"""
+"""'''),
 
-tables = extract_tables(markdown_text)
+        mo.md("### Here's the markdown table:"),
+        mo.md("""
+| Name  | Age | City     |
+|-------|-----|----------|
+| Alice | 30  | New York |
+| Bob   | 25  | London   |
+"""),
 
-for df in tables:
-    print(df)
-# Output:
-#      Name  Age      City
-# 0   Alice   30  New York
-# 1     Bob   25    London'''),
-            ]),
+        mo.md("### Extract it with the Simple API:"),
+        code_block('''tables = extract_tables(markdown_text)
+tables[0]  # Returns a pandas DataFrame'''),
 
+        mo.md("**Result:**"),
+        mo.ui.table(
+            extract_tables("""
+| Name  | Age | City     |
+|-------|-----|----------|
+| Alice | 30  | New York |
+| Bob   | 25  | London   |
+""")[0],
+            selection=None,
+        ),
+
+        mo.md("## More Examples"),
+
+        mo.ui.tabs({
             "Full API": mo.vstack([
                 mo.md("Returns metadata along with DataFrames:"),
                 code_block('''from markdown_table_extractor import extract_markdown_tables
@@ -211,7 +233,6 @@ mte extract document.md -o output.json''', "bash"),
             kind="success"
         ),
     ])
-
     return (quickstart_content,)
 
 
@@ -307,12 +328,11 @@ def _(mo, module_card):
         Each module can be used independently or as part of the full pipeline!
         """),
     ])
-
     return (modules_content,)
 
 
 @app.cell
-def _(mo, code_block):
+def _(code_block, mo):
     # Examples content
     examples_content = mo.vstack([
         mo.md("# 💡 Live Examples"),
@@ -325,99 +345,98 @@ def _(mo, code_block):
                 """),
                 code_block('''from markdown_table_extractor import extract_markdown_tables
 
-academic_table = """
-**Table 1. Patient Demographics**
+    academic_table = """
+    **Table 1. Patient Demographics**
 
-| Variable | Group A<br>n=50 | Group B<br>n=45 |
-|----------|-----------------|-----------------|
-| Age (years) | 45.2 ± 3.1 | 47.8 ± 2.9 |
-| Male/Female | 28/22 | 25/20 |
-"""
+    | Variable | Group A<br>n=50 | Group B<br>n=45 |
+    |----------|-----------------|-----------------|
+    | Age (years) | 45.2 ± 3.1 | 47.8 ± 2.9 |
+    | Male/Female | 28/22 | 25/20 |
+    """
 
-result = extract_markdown_tables(academic_table)
-print(result[0].caption)  # "**Table 1. Patient Demographics**"
-print(result[0].dataframe)'''),
+    result = extract_markdown_tables(academic_table)
+    print(result[0].caption)  # "**Table 1. Patient Demographics**"
+    print(result[0].dataframe)'''),
             ]),
 
             "📑 Multi-page Tables": mo.vstack([
                 mo.md("Tables spanning multiple pages with continuation markers:"),
                 code_block('''continued_tables = """
-Table 2. Results Summary
+    Table 2. Results Summary
 
-| ID | Name  | Score |
-|----|-------|-------|
-| 1  | Alice | 95    |
-| 2  | Bob   | 87    |
+    | ID | Name  | Score |
+    |----|-------|-------|
+    | 1  | Alice | 95    |
+    | 2  | Bob   | 87    |
 
-Table 2 (Continued)
+    Table 2 (Continued)
 
-| ID | Name  | Score |
-|----|-------|-------|
-| 3  | Carol | 92    |
-| 4  | Dave  | 88    |
-"""
+    | ID | Name  | Score |
+    |----|-------|-------|
+    | 3  | Carol | 92    |
+    | 4  | Dave  | 88    |
+    """
 
-result = extract_markdown_tables(continued_tables)
-print(f"Tables: {len(result)}")  # 1 (auto-merged!)
-print(f"Rows: {result[0].row_count}")  # 4
-print(f"Merged: {result.merged_count}")  # 1'''),
+    result = extract_markdown_tables(continued_tables)
+    print(f"Tables: {len(result)}")  # 1 (auto-merged!)
+    print(f"Rows: {result[0].row_count}")  # 4
+    print(f"Merged: {result.merged_count}")  # 1'''),
             ]),
 
             "⬅️➡️ Complex Alignment": mo.vstack([
                 mo.md("Tables with different alignment markers:"),
                 code_block('''aligned_table = """
-| Left | Center | Right |
-|:-----|:------:|------:|
-| L1   | C1     | R1    |
-| L2   | C2     | R2    |
-"""
+    | Left | Center | Right |
+    |:-----|:------:|------:|
+    | L1   | C1     | R1    |
+    | L2   | C2     | R2    |
+    """
 
-tables = extract_tables(aligned_table)
-print(tables[0])'''),
+    tables = extract_tables(aligned_table)
+    print(tables[0])'''),
             ]),
 
             "💾 Export Formats": mo.vstack([
                 mo.md("Export to various formats using pandas:"),
                 code_block('''result = extract_markdown_tables(markdown_text)
 
-# CSV
-result[0].dataframe.to_csv('output.csv', index=False)
+    # CSV
+    result[0].dataframe.to_csv('output.csv', index=False)
 
-# JSON
-result[0].dataframe.to_json('output.json', orient='records')
+    # JSON
+    result[0].dataframe.to_json('output.json', orient='records')
 
-# Excel
-result[0].dataframe.to_excel('output.xlsx', index=False)
+    # Excel
+    result[0].dataframe.to_excel('output.xlsx', index=False)
 
-# Markdown
-print(result[0].dataframe.to_markdown(index=False))'''),
+    # Markdown
+    print(result[0].dataframe.to_markdown(index=False))'''),
             ]),
 
             "⚙️ Custom Merge Strategies": mo.vstack([
                 mo.md("Control how continuation tables are merged:"),
                 code_block('''from markdown_table_extractor.core.models import TableMergeStrategy
 
-# Don't merge any tables
-result = extract_markdown_tables(
+    # Don't merge any tables
+    result = extract_markdown_tables(
     text,
     merge_strategy=TableMergeStrategy.NONE
-)
+    )
 
-# Merge tables with identical headers (default)
-result = extract_markdown_tables(
+    # Merge tables with identical headers (default)
+    result = extract_markdown_tables(
     text,
     merge_strategy=TableMergeStrategy.IDENTICAL_HEADERS
-)
+    )
 
-# Merge tables with compatible column counts (±2)
-result = extract_markdown_tables(
+    # Merge tables with compatible column counts (±2)
+    result = extract_markdown_tables(
     text,
     merge_strategy=TableMergeStrategy.COMPATIBLE_COLUMNS
-)'''),
+    )'''),
             ]),
         }, lazy=True, multiple=True),
     ])
-
     return (examples_content,)
 
 
@@ -587,12 +606,18 @@ def _(mo):
             """),
         }, lazy=True),
     ])
-
     return (api_content,)
 
 
 @app.cell
-def _(mo, home_content, quickstart_content, modules_content, examples_content, api_content):
+def _(
+    api_content,
+    examples_content,
+    home_content,
+    mo,
+    modules_content,
+    quickstart_content,
+):
     # Main application layout with tabs
     _tabs = mo.ui.tabs({
         f"{mo.icon('lucide:home')} Home": home_content,
