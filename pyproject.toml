@@ -1,6 +1,6 @@
 [project]
 name = "markdown-table-extractor"
-version = "0.1.1"
+version = "0.1.2"
 description = "Robust structured data extraction from markdown text, built with literate programming using marimo notebooks"
 readme = "README.md"
 license = { text = "MIT" }
