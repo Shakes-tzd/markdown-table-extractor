@@ -694,20 +694,51 @@ def _(
     modules_content,
     quickstart_content,
 ):
-    # Main application layout with tabs
-    _tabs = mo.ui.tabs({
-        f"{mo.icon('lucide:home')} Home": home_content,
-        f"{mo.icon('lucide:zap')} Quick Start": quickstart_content,
-        f"{mo.icon('lucide:package')} Modules": modules_content,
-        f"{mo.icon('lucide:code')} Examples": examples_content,
-        f"{mo.icon('lucide:book-open')} API": api_content,
+    # Define route handlers for each page
+    def render_home():
+        return home_content
+
+    def render_quick_start():
+        return quickstart_content
+
+    def render_modules():
+        return modules_content
+
+    def render_examples():
+        return examples_content
+
+    def render_api():
+        return api_content
+
+    # Create navigation menu (keys=hrefs, values=labels)
+    _nav = mo.nav_menu(
+        {
+            "#/": f"{mo.icon('lucide:home')} Home",
+            "#/quick-start": f"{mo.icon('lucide:zap')} Quick Start",
+            "#/modules": f"{mo.icon('lucide:package')} Modules",
+            "#/examples": f"{mo.icon('lucide:code')} Examples",
+            "#/api": f"{mo.icon('lucide:book-open')} API",
+        },
+        orientation="horizontal",
+    )
+
+    # Set up routes with hash-based navigation
+    _routes = mo.routes({
+        "#/": render_home,
+        "#/quick-start": render_quick_start,
+        "#/modules": render_modules,
+        "#/examples": render_examples,
+        "#/api": render_api,
+        mo.routes.CATCH_ALL: render_home,
     })
 
     # Create and display the final layout
     _layout = mo.vstack([
         mo.md("# 📊 Markdown Table Extractor Documentation"),
         mo.Html("<hr style='margin: 1rem 0; border: none; border-top: 2px solid #e0e0e0;'>"),
-        _tabs,
+        _nav,
+        mo.Html("<div style='margin: 2rem 0;'></div>"),
+        _routes,
     ])
 
     # Display the layout by having it as the last expression
