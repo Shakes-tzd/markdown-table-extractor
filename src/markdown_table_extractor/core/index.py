@@ -8,7 +8,8 @@ app = marimo.App(width="full")
 def _():
     import marimo as mo
     import pandas as pd
-    from markdown_table_extractor import extract_tables, extract_markdown_tables
+    # Import from local extractor module
+    from markdown_table_extractor.core.extractor import extract_tables, extract_markdown_tables
     return extract_markdown_tables, extract_tables, mo, pd
 
 
