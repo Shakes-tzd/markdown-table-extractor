@@ -177,36 +177,78 @@ def _(mo):
 
 @app.cell
 def _(mo):
-    mo.md("## HTML Cleaning Demo")
+    mo.md("## 🧹 HTML Cleaning Demo")
     return
 
 
 @app.cell
-def _():
-    # Test HTML cleaning
-    dirty = "Column<br>Name"
-    cleaned = clean_column_name(dirty)
-    print(f"Input:  '{dirty}'")
-    print(f"Output: '{cleaned}'")
-    return (dirty, cleaned)
+def _(mo, clean_column_name, clean_value):
+    # Test HTML cleaning with before/after visualization
+    _dirty_examples = [
+        ("Column<br>Name", "Column header with line break"),
+        ("Patient&nbsp;ID", "Header with non-breaking space"),
+        ("Age<br>(years)", "Header with parenthetical"),
+        ("Group&nbsp;A<br>n=50", "Complex header with HTML entities"),
+    ]
+
+    _results = []
+    for dirty_text, description in _dirty_examples:
+        _cleaned = clean_column_name(dirty_text)
+        _results.append({
+            "Input": dirty_text,
+            "Output": _cleaned,
+            "Description": description
+        })
+
+    mo.vstack([
+        mo.md("### Before & After Cleaning"),
+        mo.accordion({
+            example["Description"]: mo.vstack([
+                mo.md(f"**Input (with HTML):** `{example['Input']}`"),
+                mo.md(f"**Output (cleaned):** `{example['Output']}`"),
+                mo.callout(
+                    f"Removed: {set(example['Input']) - set(example['Output']) if example['Input'] != example['Output'] else 'nothing'}",
+                    kind="neutral"
+                ) if example['Input'] != example['Output'] else mo.md("")
+            ])
+            for example in _results
+        }, multiple=True)
+    ])
+    return
 
 
 @app.cell
 def _(mo):
-    mo.md("## Header Matching Demo")
+    mo.md("## 🔀 Header Matching Demo")
     return
 
 
 @app.cell
-def _():
-    # Test header matching
-    h1 = ["Name", "Age", "City"]
-    h2 = ["name", "age", "city"]
-    h3 = ["Name", "Score", "City"]
-    
-    print(f"h1 vs h2 (same, different case): {headers_match(h1, h2)}")
-    print(f"h1 vs h3 (one different): {headers_match(h1, h3)}")
-    return (h1, h2, h3)
+def _(mo, headers_match):
+    # Test header matching with visual comparison
+    _header_tests = [
+        (["Name", "Age", "City"], ["name", "age", "city"], "Same headers, different case"),
+        (["Name", "Age", "City"], ["Name", "Age", "Location"], "One column different"),
+        (["ID", "Patient Name", "Score"], ["ID", "Patient Name", "Score"], "Exact match"),
+        (["Column A", "Column B"], ["Column A", "Column C"], "50% match"),
+    ]
+
+    _comparison_results = []
+    for h1, h2, desc in _header_tests:
+        _match = headers_match(h1, h2)
+        _emoji = "✅" if _match else "❌"
+        _comparison_results.append(mo.vstack([
+            mo.md(f"### {desc}"),
+            mo.md(f"**Headers 1:** `{h1}`"),
+            mo.md(f"**Headers 2:** `{h2}`"),
+            mo.callout(
+                f"{_emoji} Match result: **{_match}**",
+                kind="success" if _match else "warn"
+            ),
+        ]))
+
+    mo.vstack(_comparison_results)
+    return
 
 
 if __name__ == "__main__":

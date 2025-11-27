@@ -53,7 +53,7 @@ def main():
         # Create output directory
         output_path.mkdir(parents=True, exist_ok=True)
 
-        # Export command
+        # Export command (code hidden by default - users can toggle visibility)
         cmd = [
             "uv",
             "run",
@@ -65,7 +65,6 @@ def main():
             str(output_path),
             "--mode",
             mode,
-            "--show-code",
         ]
 
         try:

@@ -321,50 +321,87 @@ def _(mo):
 
 @app.cell
 def _(mo):
-    mo.md("## Continuation Detection Demo")
+    mo.md("## 🔍 Continuation Detection Demo")
     return
 
 
 @app.cell
-def _():
-    # Test continuation patterns
-    test_captions = [
-        "Table 3. Results",
-        "Table 3 (Continued)",
-        "Table 3 (cont.)",
-        "Table 3 - cont'd",
+def _(mo, CONTINUATION_PATTERN):
+    # Test continuation patterns with visual output
+    _test_captions = [
+        ("Table 3. Results", "Regular table caption"),
+        ("Table 3 (Continued)", "Standard continuation marker"),
+        ("Table 3 (cont.)", "Abbreviated continuation"),
+        ("Table 3 - cont'd", "Alternative continuation format"),
+        ("Table 4. Data Summary", "Another regular caption"),
     ]
-    
-    for caption in test_captions:
-        is_cont = bool(CONTINUATION_PATTERN.search(caption))
-        print(f"{caption:30} -> continuation={is_cont}")
-    return (test_captions,)
+
+    _results = []
+    for caption, description in _test_captions:
+        _is_cont = bool(CONTINUATION_PATTERN.search(caption))
+        _emoji = "🔗" if _is_cont else "📄"
+        _results.append(f"{_emoji} `{caption:35}` → **{_is_cont}** ({description})")
+
+    mo.md("\n\n".join(_results))
+    return
 
 
 @app.cell
 def _(mo):
-    mo.md("## Merge Demo")
+    mo.md("""
+    ## 🔗 Table Merging Demo
+
+    See how continuation tables are automatically merged into a single table.
+    """)
     return
 
 
 @app.cell
-def _(pd, ExtractedTable, merge_tables):
-    # Create sample tables
-    df1 = pd.DataFrame({"A": [1, 2], "B": [3, 4]})
-    df2 = pd.DataFrame({"A": [5, 6], "B": [7, 8]})
+def _(mo, pd, ExtractedTable, merge_tables):
+    # Create sample tables with visual before/after
+    _df1 = pd.DataFrame({"ID": [1, 2], "Name": ["Alice", "Bob"], "Score": [95, 87]})
+    _df2 = pd.DataFrame({"ID": [3, 4], "Name": ["Carol", "Dave"], "Score": [92, 88]})
 
-    t1 = ExtractedTable(df1, caption="Table 1. Data")
-    t2 = ExtractedTable(df2, caption="Table 1 (Continued)", is_continuation=True)
+    _t1 = ExtractedTable(_df1, caption="Table 1. Test Results")
+    _t2 = ExtractedTable(_df2, caption="Table 1 (Continued)", is_continuation=True)
 
-    print("Before merge:")
-    print(f"  Table 1: {len(t1.dataframe)} rows")
-    print(f"  Table 2: {len(t2.dataframe)} rows")
+    _merged = merge_tables([_t1, _t2])
 
-    merged = merge_tables([t1, t2])
+    mo.vstack([
+        mo.md("### Before Merging"),
+        mo.accordion({
+            "Table 1 (Original)": mo.vstack([
+                mo.md(f"**Caption:** `{_t1.caption}`"),
+                mo.md(f"**Rows:** {_t1.row_count}, **Columns:** {_t1.column_count}"),
+                mo.ui.table(_t1.dataframe),
+            ]),
+            "Table 2 (Continuation)": mo.vstack([
+                mo.md(f"**Caption:** `{_t2.caption}`"),
+                mo.md(f"**Is Continuation:** {_t2.is_continuation} ✓"),
+                mo.md(f"**Rows:** {_t2.row_count}, **Columns:** {_t2.column_count}"),
+                mo.ui.table(_t2.dataframe),
+            ]),
+        }),
 
-    print(f"\nAfter merge:")
-    print(f"  Result: {len(merged[0].dataframe)} rows")
-    return (df1, df2, t1, t2, merged)
+        mo.md("### After Merging"),
+        mo.callout(
+            f"Merged **2 tables** into **1 table** with **{_merged[0].row_count} total rows**",
+            kind="success"
+        ),
+        mo.ui.table(_merged[0].dataframe),
+
+        mo.md("### Merge Details"),
+        mo.accordion({
+            "Final Table Info": mo.md(f"""
+            - **Caption:** `{_merged[0].caption}`
+            - **Total Rows:** {_merged[0].row_count}
+            - **Columns:** {_merged[0].column_count}
+            - **Is Continuation:** {_merged[0].is_continuation}
+            - **Original Tables:** 2 → 1
+            """),
+        }),
+    ])
+    return
 
 
 if __name__ == "__main__":

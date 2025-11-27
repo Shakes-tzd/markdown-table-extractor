@@ -41,48 +41,42 @@ jobs:
           uv run marimo export html-wasm \
             src/markdown_table_extractor/core/index.py \
             -o _site \
-            --mode run \
-            --show-code
+            --mode run
 
       - name: Export parser notebook
         run: |
           uv run marimo export html-wasm \
             src/markdown_table_extractor/core/parser.py \
             -o _site/parser \
-            --mode edit \
-            --show-code
+            --mode edit
 
       - name: Export cleaner notebook
         run: |
           uv run marimo export html-wasm \
             src/markdown_table_extractor/core/cleaner.py \
             -o _site/cleaner \
-            --mode edit \
-            --show-code
+            --mode edit
 
       - name: Export merger notebook
         run: |
           uv run marimo export html-wasm \
             src/markdown_table_extractor/core/merger.py \
             -o _site/merger \
-            --mode edit \
-            --show-code
+            --mode edit
 
       - name: Export extractor notebook
         run: |
           uv run marimo export html-wasm \
             src/markdown_table_extractor/core/extractor.py \
             -o _site/extractor \
-            --mode edit \
-            --show-code
+            --mode edit
 
       - name: Export models notebook
         run: |
           uv run marimo export html-wasm \
             src/markdown_table_extractor/core/models.py \
             -o _site/models \
-            --mode edit \
-            --show-code
+            --mode edit
 
       - name: Create .nojekyll
         run: touch _site/.nojekyll

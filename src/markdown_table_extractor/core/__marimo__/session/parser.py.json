@@ -5,39 +5,13 @@
   },
   "cells": [
     {
-      "id": "setup",
-      "code_hash": "47caa1d69418e7d984e7c7c3e037745c",
-      "outputs": [
-        {
-          "type": "data",
-          "data": {
-            "text/plain": ""
-          }
-        }
-      ],
-      "console": []
-    },
-    {
-      "id": "Hbol",
-      "code_hash": "6157f518668e7939d79e3f3cb5a6152d",
-      "outputs": [
-        {
-          "type": "data",
-          "data": {
-            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><h1 id=\"markdown-parser\">\ud83d\udd0d Markdown Parser</h1>\n<span class=\"paragraph\">This module provides utilities for parsing markdown table syntax.</span>\n<h2 id=\"the-separator-row-problem\">The Separator Row Problem</h2>\n<span class=\"paragraph\">One of the key challenges in markdown table parsing is detecting <strong>separator rows</strong>.\nThese rows define column alignment but should NOT appear in the extracted data.</span>\n<span class=\"paragraph\"><strong>Standard markdown separators:</strong>\n<div class=\"language-markdown codehilite\"><pre><span></span><code>| --- | --- |        # Basic (no alignment)\n| :-- | --: |        # Left/right aligned\n| :--: | :--: |      # Center aligned\n</code></pre></div></span>\n<span class=\"paragraph\">Many parsers fail to detect the alignment syntax (<code>:--:</code>) and include\nthese rows as data. This module handles ALL valid separator formats.</span></span>"
-          }
-        }
-      ],
-      "console": []
-    },
-    {
       "id": "MJUe",
-      "code_hash": "bd0f16288fe427ebda068b53cccd3971",
+      "code_hash": "08bfd2796d37422c501a6a61fe52f2a5",
       "outputs": [
         {
           "type": "data",
           "data": {
-            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><h2 id=\"is_separator_rowline\"><code>is_separator_row(line)</code></h2>\n<span class=\"paragraph\">The core function for detecting separator rows. Handles:</span>\n<table>\n<thead>\n<tr>\n<th>Format</th>\n<th>Example</th>\n</tr>\n</thead>\n<tbody>\n<tr>\n<td>Basic</td>\n<td><code>\\| --- \\| --- \\|</code></td>\n</tr>\n<tr>\n<td>Centered</td>\n<td><code>\\| :--: \\| :--: \\|</code></td>\n</tr>\n<tr>\n<td>Left align</td>\n<td><code>\\| :--- \\| :--- \\|</code></td>\n</tr>\n<tr>\n<td>Right align</td>\n<td><code>\\| ---: \\| ---: \\|</code></td>\n</tr>\n<tr>\n<td>Mixed</td>\n<td><code>\\| :--- \\| ---: \\| :--: \\|</code></td>\n</tr>\n</tbody>\n</table>\n<span class=\"paragraph\"><strong>Algorithm:</strong></span>\n<ol>\n<li>Split by <code>|</code> to get cells</li>\n<li>Each cell must match: <code>^:?-{1,}:?$</code></li>\n<li>All cells must match for the row to be a separator</li>\n</ol></span>"
+            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><h1 id=\"markdown-table-parser\">Markdown Table Parser</h1>\n<span class=\"paragraph\">Functions for detecting and parsing markdown table structures.</span>\n<h2 id=\"key-functions\">Key Functions</h2>\n<ul>\n<li><code>is_table_row(line)</code> - Check if line is a table row</li>\n<li><code>is_separator_row(line)</code> - Check if line is separator (---)</li>\n<li><code>parse_table_row(line)</code> - Extract cell contents</li>\n<li><code>detect_caption(lines, start)</code> - Find table caption</li>\n</ul></span>"
           }
         }
       ],
@@ -45,7 +19,33 @@
     },
     {
       "id": "vblA",
-      "code_hash": "35741ff08497e7efef3aa64534f31903",
+      "code_hash": "6ec3f140238faafc7580f4e5f342202a",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><h2 id=\"separator-detection-demo\">Separator Detection Demo</h2></span>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "lEQa",
+      "code_hash": "c6743adb5e8518551295ea218e18da91",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><h2 id=\"row-parsing-demo\">Row Parsing Demo</h2></span>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "Hbol",
+      "code_hash": "1d0db38904205bec4d6f6f6a1f6cec3e",
       "outputs": [
         {
           "type": "data",
@@ -58,159 +58,43 @@
     },
     {
       "id": "bkHC",
-      "code_hash": "831bb0681809e3413a959f994bcd6bad",
+      "code_hash": "4aeff5d00e1ea2ec0dc385bdb11c349d",
       "outputs": [
         {
-          "type": "data",
-          "data": {
-            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><h2 id=\"is_table_rowline\"><code>is_table_row(line)</code></h2>\n<span class=\"paragraph\">Simple check for whether a line is ANY table row (header, data, or separator).</span>\n<span class=\"paragraph\">A table row must:</span>\n<ul>\n<li>Start with <code>|</code></li>\n<li>End with <code>|</code></li>\n</ul></span>"
-          }
+          "type": "error",
+          "ename": "exception",
+          "evalue": "name 'is_separator_row' is not defined",
+          "traceback": []
         }
       ],
-      "console": []
-    },
-    {
-      "id": "lEQa",
-      "code_hash": "1db8cdc165eae277e184d08504150619",
-      "outputs": [
+      "console": [
         {
-          "type": "data",
-          "data": {
-            "text/plain": ""
-          }
+          "type": "stream",
+          "name": "stderr",
+          "text": "<span class=\"codehilite\"><div class=\"highlight\"><pre><span></span><span class=\"gt\">Traceback (most recent call last):</span>\n  File <span class=\"nb\">&quot;/var/folders/5l/h3slgb611jx217k86v3jfcm40000gn/T/marimo_72960/__marimo__cell_bkHC_.py&quot;</span>, line <span class=\"m\">11</span>, in <span class=\"n\">&lt;module&gt;</span>\n<span class=\"w\">    </span><span class=\"n\">result</span> <span class=\"o\">=</span> <span class=\"n\">is_separator_row</span><span class=\"p\">(</span><span class=\"n\">line</span><span class=\"p\">)</span>\n<span class=\"w\">             </span><span class=\"pm\">^^^^^^^^^^^^^^^^</span>\n<span class=\"gr\">NameError</span>: <span class=\"n\">name &#39;is_separator_row&#39; is not defined</span>\n</pre></div>\n</span>",
+          "mimetype": "application/vnd.marimo+traceback"
         }
-      ],
-      "console": []
+      ]
     },
     {
       "id": "PKri",
-      "code_hash": "fe12576f7b11a7ad92e29a126eb426f8",
+      "code_hash": "b888c0fe265efdc3f2099f392dc4bed2",
       "outputs": [
         {
-          "type": "data",
-          "data": {
-            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><h2 id=\"parse_table_rowline\"><code>parse_table_row(line)</code></h2>\n<span class=\"paragraph\">Extracts cell values from a table row.</span>\n<div class=\"language-python codehilite\"><pre><span></span><code><span class=\"o\">&gt;&gt;&gt;</span> <span class=\"n\">parse_table_row</span><span class=\"p\">(</span><span class=\"s2\">&quot;| Alice | 30 | Engineer |&quot;</span><span class=\"p\">)</span>\n<span class=\"p\">[</span><span class=\"s1\">&#39;Alice&#39;</span><span class=\"p\">,</span> <span class=\"s1\">&#39;30&#39;</span><span class=\"p\">,</span> <span class=\"s1\">&#39;Engineer&#39;</span><span class=\"p\">]</span>\n</code></pre></div></span>"
-          }
+          "type": "error",
+          "ename": "exception",
+          "evalue": "name 'parse_table_row' is not defined",
+          "traceback": []
         }
       ],
-      "console": []
-    },
-    {
-      "id": "Xref",
-      "code_hash": "a7f11ab5ee33ea14965603e705939296",
-      "outputs": [
+      "console": [
         {
-          "type": "data",
-          "data": {
-            "text/plain": ""
-          }
+          "type": "stream",
+          "name": "stderr",
+          "text": "<span class=\"codehilite\"><div class=\"highlight\"><pre><span></span><span class=\"gt\">Traceback (most recent call last):</span>\n  File <span class=\"nb\">&quot;/var/folders/5l/h3slgb611jx217k86v3jfcm40000gn/T/marimo_72960/__marimo__cell_PKri_.py&quot;</span>, line <span class=\"m\">3</span>, in <span class=\"n\">&lt;module&gt;</span>\n<span class=\"w\">    </span><span class=\"n\">cells</span> <span class=\"o\">=</span> <span class=\"n\">parse_table_row</span><span class=\"p\">(</span><span class=\"n\">row</span><span class=\"p\">)</span>\n<span class=\"w\">            </span><span class=\"pm\">^^^^^^^^^^^^^^^</span>\n<span class=\"gr\">NameError</span>: <span class=\"n\">name &#39;parse_table_row&#39; is not defined</span>\n</pre></div>\n</span>",
+          "mimetype": "application/vnd.marimo+traceback"
         }
-      ],
-      "console": []
-    },
-    {
-      "id": "SFPL",
-      "code_hash": "3fa9a670220960f02c0d1cdb58e14670",
-      "outputs": [
-        {
-          "type": "data",
-          "data": {
-            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><h2 id=\"is_sub_header_rowcells-header_cells\"><code>is_sub_header_row(cells, header_cells)</code></h2>\n<span class=\"paragraph\">Detects multi-level header rows common in academic manuscripts.</span>\n<span class=\"paragraph\"><strong>Example of sub-headers:</strong>\n<div class=\"language-markdown codehilite\"><pre><span></span><code>| Study | Outcome | | |\n|-------|---------|-------|------|\n|       | Early   | Late  | Both |  \u2190 This is a sub-header row\n| A     | Yes     | No    | No   |\n</code></pre></div></span>\n<span class=\"paragraph\">Sub-headers typically:</span>\n<ul>\n<li>Have mostly empty cells</li>\n<li>Non-empty cells are short labels (not data)</li>\n<li>Appear immediately after the separator row</li>\n</ul></span>"
-          }
-        }
-      ],
-      "console": []
-    },
-    {
-      "id": "BYtC",
-      "code_hash": "5fb42f7de737854afa8040165b2a501e",
-      "outputs": [
-        {
-          "type": "data",
-          "data": {
-            "text/plain": ""
-          }
-        }
-      ],
-      "console": []
-    },
-    {
-      "id": "RGSE",
-      "code_hash": "2570148030ff0f03dea2d9df7a4310d7",
-      "outputs": [
-        {
-          "type": "data",
-          "data": {
-            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><h2 id=\"detect_captionlines-table_start_line-max_lines_before\"><code>detect_caption(lines, table_start_line, max_lines_before)</code></h2>\n<span class=\"paragraph\">Finds table captions by looking at lines above the table.</span>\n<span class=\"paragraph\"><strong>Detected patterns:</strong></span>\n<ul>\n<li><code>Table 1. Title here</code></li>\n<li><code>Table 1 (Continued)</code></li>\n<li><code>**Table 1. Title**</code> (bold)</li>\n</ul>\n<span class=\"paragraph\">Returns both the caption text and whether it's a continuation.</span></span>"
-          }
-        }
-      ],
-      "console": []
-    },
-    {
-      "id": "Kclp",
-      "code_hash": "b5988a24bdb0986412006e4f5dc42ace",
-      "outputs": [
-        {
-          "type": "data",
-          "data": {
-            "text/plain": ""
-          }
-        }
-      ],
-      "console": []
-    },
-    {
-      "id": "emfo",
-      "code_hash": "7e4f9869db43c6510c808c05ab7801ca",
-      "outputs": [
-        {
-          "type": "data",
-          "data": {
-            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><hr />\n<h2 id=\"interactive-testing\">\ud83e\uddea Interactive Testing</h2>\n<span class=\"paragraph\">Test the separator detection with various formats:</span></span>"
-          }
-        }
-      ],
-      "console": []
-    },
-    {
-      "id": "Hstk",
-      "code_hash": "c9f6ca5c36aff25084d7328829b6fa18",
-      "outputs": [
-        {
-          "type": "data",
-          "data": {
-            "text/html": "<marimo-ui-element object-id='Hstk-0' random-id='b8a54159-0dad-f40c-1b12-ab189bad3078'><marimo-table data-initial-value='[]' data-label='null' data-data='&quot;[{&#92;&quot;_marimo_row_id&#92;&quot;:0,&#92;&quot;Line&#92;&quot;:&#92;&quot;`| --- | --- |`&#92;&quot;,&#92;&quot;Expected&#92;&quot;:true,&#92;&quot;Actual&#92;&quot;:true,&#92;&quot;Status&#92;&quot;:&#92;&quot;&#92;&#92;u2705&#92;&quot;,&#92;&quot;Description&#92;&quot;:&#92;&quot;Basic separator&#92;&quot;},{&#92;&quot;_marimo_row_id&#92;&quot;:1,&#92;&quot;Line&#92;&quot;:&#92;&quot;`| :--: | :--: |`&#92;&quot;,&#92;&quot;Expected&#92;&quot;:true,&#92;&quot;Actual&#92;&quot;:true,&#92;&quot;Status&#92;&quot;:&#92;&quot;&#92;&#92;u2705&#92;&quot;,&#92;&quot;Description&#92;&quot;:&#92;&quot;Centered&#92;&quot;},{&#92;&quot;_marimo_row_id&#92;&quot;:2,&#92;&quot;Line&#92;&quot;:&#92;&quot;`| :--- | ---: |`&#92;&quot;,&#92;&quot;Expected&#92;&quot;:true,&#92;&quot;Actual&#92;&quot;:true,&#92;&quot;Status&#92;&quot;:&#92;&quot;&#92;&#92;u2705&#92;&quot;,&#92;&quot;Description&#92;&quot;:&#92;&quot;Left/Right&#92;&quot;},{&#92;&quot;_marimo_row_id&#92;&quot;:3,&#92;&quot;Line&#92;&quot;:&#92;&quot;`|---|---|`&#92;&quot;,&#92;&quot;Expected&#92;&quot;:true,&#92;&quot;Actual&#92;&quot;:true,&#92;&quot;Status&#92;&quot;:&#92;&quot;&#92;&#92;u2705&#92;&quot;,&#92;&quot;Description&#92;&quot;:&#92;&quot;No spaces&#92;&quot;},{&#92;&quot;_marimo_row_id&#92;&quot;:4,&#92;&quot;Line&#92;&quot;:&#92;&quot;`| Data | More |`&#92;&quot;,&#92;&quot;Expected&#92;&quot;:false,&#92;&quot;Actual&#92;&quot;:false,&#92;&quot;Status&#92;&quot;:&#92;&quot;&#92;&#92;u2705&#92;&quot;,&#92;&quot;Description&#92;&quot;:&#92;&quot;Data row&#92;&quot;},{&#92;&quot;_marimo_row_id&#92;&quot;:5,&#92;&quot;Line&#92;&quot;:&#92;&quot;`| 2021 | 45% |`&#92;&quot;,&#92;&quot;Expected&#92;&quot;:false,&#92;&quot;Actual&#92;&quot;:false,&#92;&quot;Status&#92;&quot;:&#92;&quot;&#92;&#92;u2705&#92;&quot;,&#92;&quot;Description&#92;&quot;:&#92;&quot;Numbers&#92;&quot;},{&#92;&quot;_marimo_row_id&#92;&quot;:6,&#92;&quot;Line&#92;&quot;:&#92;&quot;(empty)&#92;&quot;,&#92;&quot;Expected&#92;&quot;:false,&#92;&quot;Actual&#92;&quot;:false,&#92;&quot;Status&#92;&quot;:&#92;&quot;&#92;&#92;u2705&#92;&quot;,&#92;&quot;Description&#92;&quot;:&#92;&quot;Empty&#92;&quot;}]&quot;' data-total-rows='7' data-total-columns='5' data-max-columns='50' data-banner-text='&quot;&quot;' data-pagination='false' data-page-size='10' data-field-types='[[&quot;Line&quot;,[&quot;string&quot;,&quot;object&quot;]],[&quot;Expected&quot;,[&quot;boolean&quot;,&quot;bool&quot;]],[&quot;Actual&quot;,[&quot;boolean&quot;,&quot;bool&quot;]],[&quot;Status&quot;,[&quot;string&quot;,&quot;object&quot;]],[&quot;Description&quot;,[&quot;string&quot;,&quot;object&quot;]]]' data-selection='&quot;multi&quot;' data-show-filters='true' data-show-download='true' data-show-column-summaries='false' data-show-data-types='true' data-show-page-size-selector='true' data-show-column-explorer='true' data-show-chart-builder='true' data-row-headers='[]' data-has-stable-row-id='true' data-lazy='false' data-preload='false'></marimo-table></marimo-ui-element>"
-          }
-        }
-      ],
-      "console": []
-    },
-    {
-      "id": "nWHF",
-      "code_hash": "cf48269416424dd2bde13f3fea59e04f",
-      "outputs": [
-        {
-          "type": "data",
-          "data": {
-            "text/html": "<marimo-ui-element object-id='nWHF-0' random-id='3a39d136-f1e0-06b8-54d1-69ce579b5e8c'><marimo-text data-initial-value='&quot;| :--: | :--: |&quot;' data-label='&quot;&lt;span class=&#92;&quot;markdown prose dark:prose-invert contents&#92;&quot;&gt;&lt;span class=&#92;&quot;paragraph&#92;&quot;&gt;Test a line:&lt;/span&gt;&lt;/span&gt;&quot;' data-placeholder='&quot;&quot;' data-kind='&quot;text&quot;' data-full-width='true' data-disabled='false' data-debounce='true'></marimo-text></marimo-ui-element>"
-          }
-        }
-      ],
-      "console": []
-    },
-    {
-      "id": "iLit",
-      "code_hash": "b5efcb2e2041b3553d2ab575b1f5c0f5",
-      "outputs": [
-        {
-          "type": "data",
-          "data": {
-            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><span class=\"paragraph\"><strong>Result:</strong> <code>True</code></span>\n<span class=\"paragraph\">\u2705 This IS a separator row</span></span>"
-          }
-        }
-      ],
-      "console": []
+      ]
     }
   ]
 }

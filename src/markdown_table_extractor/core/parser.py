@@ -269,58 +269,77 @@ def _(mo):
 @app.cell
 def _(mo):
     mo.md("""
-    ## Separator Detection Demo
+    ## 🔍 Separator Detection Demo
+
+    Test how the parser identifies table separator rows with different alignment markers.
     """)
     return
 
 
 @app.cell
-def _():
-    # Test separator detection
-    test_lines = [
-        "| --- | --- |",
-        "| :--- | ---: |",
-        "| :---: | :---: |",
-        "| Data | More |",
-        "| - | - |",
+def _(mo, is_separator_row):
+    # Test separator detection with visual output
+    test_cases = [
+        ("| --- | --- |", "Basic separator"),
+        ("| :--- | ---: |", "Left and right aligned"),
+        ("| :---: | :---: |", "Center aligned"),
+        ("| Data | More |", "Regular data row (not a separator)"),
+        ("| - | - |", "Single dash separator"),
     ]
 
-    for line in test_lines:
+    results = []
+    for line, description in test_cases:
         result = is_separator_row(line)
-        print(f"{line:25} -> separator={result}")
-    return (test_lines,)
+        emoji = "✅" if result else "❌"
+        results.append(f"{emoji} `{line:20}` → **{result}** ({description})")
+
+    mo.md("\n\n".join(results))
+    return (test_cases, results)
 
 
 @app.cell
 def _(mo):
     mo.md("""
-    ## Row Parsing Demo
+    ## 📋 Row Parsing Demo
+
+    See how table rows are parsed into individual cell values.
     """)
     return
 
 
 @app.cell
-def _():
-    # Test row parsing
-    row = "| Name | Age | City |"
-    cells = parse_table_row(row)
-    print(f"Input: {row}")
-    print(f"Cells: {cells}")
-    return (row, cells)
+def _(mo, parse_table_row):
+    # Test row parsing with before/after visualization
+    _test_row = "| Name | Age | City |"
+    _parsed_cells = parse_table_row(_test_row)
+
+    mo.vstack([
+        mo.md("**Input (raw markdown):**"),
+        mo.md(f"```markdown\n{_test_row}\n```"),
+        mo.md("**Output (parsed cells):**"),
+        mo.json(_parsed_cells),
+        mo.callout(
+            f"Extracted **{len(_parsed_cells)} cells**: {', '.join([f'`{c}`' for c in _parsed_cells])}",
+            kind="success"
+        ),
+    ])
+    return
 
 
 @app.cell
 def _(mo):
     mo.md("""
-    ## Caption Detection Demo
+    ## 🏷️ Caption Detection Demo
+
+    Demonstrates how captions are detected and parsed from markdown documents.
     """)
     return
 
 
 @app.cell
-def _():
-    # Test caption detection
-    test_doc = [
+def _(mo, detect_caption):
+    # Test caption detection with visual output
+    _test_doc = [
         "# Document",
         "",
         "Table 3. Test Results",
@@ -330,12 +349,20 @@ def _():
         "| Alice | 95 |",
     ]
 
-    caption, is_cont, table_num, is_bare = detect_caption(test_doc, 4)
-    print(f"Caption: {caption}")
-    print(f"Is continuation: {is_cont}")
-    print(f"Table number: {table_num}")
-    print(f"Is bare: {is_bare}")
-    return (test_doc, caption, is_cont, table_num, is_bare)
+    _caption, _is_cont, _table_num, _is_bare = detect_caption(_test_doc, 4)
+
+    mo.vstack([
+        mo.md("**Document context:**"),
+        mo.md(f"```markdown\n{chr(10).join(_test_doc)}\n```"),
+        mo.md("**Detected information:**"),
+        mo.accordion({
+            "Caption": mo.md(f"`{_caption}`" if _caption else "No caption detected"),
+            "Is Continuation": mo.md(f"**{_is_cont}** - Table is {'a continuation' if _is_cont else 'not a continuation'}"),
+            "Table Number": mo.md(f"`{_table_num}`" if _table_num else "No number detected"),
+            "Is Bare Caption": mo.md(f"**{_is_bare}** - Caption is {'bare (just number)' if _is_bare else 'descriptive'}"),
+        }),
+    ])
+    return
 
 
 if __name__ == "__main__":

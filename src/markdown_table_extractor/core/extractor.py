@@ -283,12 +283,16 @@ def _(mo):
 
 @app.cell
 def _(mo):
-    mo.md("## Live Demo")
+    mo.md("""
+    ## 🎯 End-to-End Extraction Demo
+
+    See the complete extraction pipeline in action!
+    """)
     return
 
 
 @app.cell
-def _():
+def _(mo):
     sample_markdown = """
 # Sample Document
 
@@ -309,35 +313,102 @@ Table 2. Summary
 | Mean | 91.3 |
 | Median | 92 |
 """
+
+    mo.vstack([
+        mo.md("### Input Markdown"),
+        mo.md(f"```markdown\n{sample_markdown}\n```"),
+    ])
     return (sample_markdown,)
 
 
 @app.cell
-def _(sample_markdown):
-    # Extract tables
-    result = extract_markdown_tables(sample_markdown)
-    print(f"Found {len(result)} tables")
-    print(f"Errors: {result.errors}")
-    return (result,)
+def _(mo, extract_markdown_tables, sample_markdown):
+    # Extract tables with full visualization
+    _result = extract_markdown_tables(sample_markdown)
+
+    mo.vstack([
+        mo.md("### Extraction Results"),
+        mo.callout(
+            f"Found **{len(_result)} tables** | Errors: {len(_result.errors)} | Merged: {_result.merged_count}",
+            kind="success" if not _result.has_errors else "warn"
+        ),
+
+        mo.md("### Extracted Tables"),
+        mo.accordion({
+            f"Table {i+1}: {table.caption}": mo.vstack([
+                mo.md(f"""
+                **Table Information:**
+                - Caption: `{table.caption}`
+                - Rows: {table.row_count}
+                - Columns: {table.column_count}
+                - Lines: {table.start_line}–{table.end_line}
+                """),
+                mo.md("**Data:**"),
+                mo.ui.table(table.dataframe),
+            ])
+            for i, table in enumerate(_result.tables)
+        }),
+    ])
+    return (_result,)
 
 
 @app.cell
-def _(result):
-    # Show first table
-    if result.tables:
-        _table1 = result.tables[0]
-        print(f"Caption: {_table1.caption}")
-        _table1.dataframe
+def _(mo):
+    mo.md("""
+    ## 📊 Complex Example: Continuation Tables
+
+    Demonstration of automatic table merging with continuation markers.
+    """)
     return
 
 
 @app.cell
-def _(result):
-    # Show second table
-    if len(result.tables) > 1:
-        _table2 = result.tables[1]
-        print(f"Caption: {_table2.caption}")
-        _table2.dataframe
+def _(mo, extract_markdown_tables):
+    _complex_md = """
+Table 3. Patient Demographics
+
+| ID | Name  | Age | Gender |
+|----|-------|-----|--------|
+| 1  | Alice | 45  | F      |
+| 2  | Bob   | 52  | M      |
+
+Table 3 (Continued)
+
+| ID | Name  | Age | Gender |
+|----|-------|-----|--------|
+| 3  | Carol | 38  | F      |
+| 4  | Dave  | 61  | M      |
+"""
+
+    _complex_result = extract_markdown_tables(_complex_md)
+
+    mo.vstack([
+        mo.md("### Input (Two Tables with Continuation Marker)"),
+        mo.md(f"```markdown\n{_complex_md}\n```"),
+
+        mo.md("### Output (Automatically Merged)"),
+        mo.callout(
+            f"Merged **{_complex_result.merged_count} continuation table** → Result: **{len(_complex_result)} table** with **{_complex_result[0].row_count} total rows**",
+            kind="success"
+        ),
+
+        mo.ui.table(_complex_result[0].dataframe),
+
+        mo.md("### How It Works"),
+        mo.accordion({
+            "Detection": mo.md("""
+            1. **Caption Detection**: Found "Table 3 (Continued)" marker
+            2. **Header Matching**: Verified columns match previous table
+            3. **Auto-Merge**: Combined into single DataFrame
+            """),
+            "Configuration": mo.md("""
+            You can control merging behavior with `merge_strategy`:
+            - `IDENTICAL_HEADERS` (default) - Merge if headers match
+            - `COMPATIBLE_COLUMNS` - Merge if column counts ±2
+            - `NONE` - Don't merge, keep separate
+            """),
+        }),
+    ])
     return
 
 
