@@ -1,6 +1,6 @@
 [project]
 name = "markdown-table-extractor"
-version = "0.1.0"
+version = "0.1.1"
 description = "Robust structured data extraction from markdown text, built with literate programming using marimo notebooks"
 readme = "README.md"
 license = { text = "MIT" }
@@ -39,7 +39,6 @@ dependencies = [
     "pandas>=2.0.0",
     "tabulate>=0.9.0", # Required for DataFrame.to_markdown()
     "rich>=13.0.0", # For beautiful CLI table display
-    "rapidfuzz>=3.14.3",
 ]
 
 [project.optional-dependencies]
